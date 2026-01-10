@@ -38,7 +38,7 @@
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
       <Requirements>
-        <bt:Sets DefaultMinVersion="1.3">
+        <bt:Sets DefaultMinVersion="1.4">
           <bt:Set Name="Mailbox"/>
         </bt:Sets>
       </Requirements>
@@ -47,7 +47,31 @@
           <DesktopFormFactor>
             <FunctionFile resid="Commands.Url"/>
             
-            <!-- READ MODE -->
+            <!-- READ MODE - Default Tab -->
+            <ExtensionPoint xsi:type="MessageReadCommandSurface">
+              <OfficeTab id="TabDefault">
+                <Group id="msgReadGroupDefault">
+                  <Label resid="GroupLabel"/>
+                  <Control xsi:type="Button" id="msgReadOpenPaneButtonDefault">
+                    <Label resid="TaskpaneButton.Label"/>
+                    <Supertip>
+                      <Title resid="TaskpaneButton.Label"/>
+                      <Description resid="TaskpaneButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="Taskpane.Url"/>
+                    </Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+            
+            <!-- READ MODE - Custom Tab -->
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <CustomTab id="TabInfoGuardRead">
                 <Group id="msgReadGroup">
@@ -87,7 +111,31 @@
               </CustomTab>
             </ExtensionPoint>
             
-            <!-- COMPOSE MODE -->
+            <!-- COMPOSE MODE - Default Tab (Message Tab) -->
+            <ExtensionPoint xsi:type="MessageComposeCommandSurface">
+              <OfficeTab id="TabDefault">
+                <Group id="msgComposeGroupDefault">
+                  <Label resid="GroupLabel"/>
+                  <Control xsi:type="Button" id="msgComposeOpenPaneButtonDefault">
+                    <Label resid="TaskpaneButton.Label"/>
+                    <Supertip>
+                      <Title resid="TaskpaneButton.Label"/>
+                      <Description resid="TaskpaneButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="Taskpane.Url"/>
+                    </Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+            
+            <!-- COMPOSE MODE - Custom Tab -->
             <ExtensionPoint xsi:type="MessageComposeCommandSurface">
               <CustomTab id="TabInfoGuardCompose">
                 <Group id="msgComposeGroup">
@@ -145,10 +193,12 @@
           <bt:String id="GroupLabel" DefaultValue="My Tools"/>
           <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
           <bt:String id="ActionButton.Label" DefaultValue="Perform an action"/>
+          <bt:String id="ContextMenuButton.Label" DefaultValue="InfoGuard"/>
         </bt:ShortStrings>
         <bt:LongStrings>
           <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a pane displaying all available properties."/>
           <bt:String id="ActionButton.Tooltip" DefaultValue="Perform an action when clicked."/>
+          <bt:String id="ContextMenuButton.Tooltip" DefaultValue="Open InfoGuard task pane"/>
         </bt:LongStrings>
       </Resources>
       <WebApplicationInfo>
@@ -157,6 +207,7 @@
         <Scopes>
           <Scope>User.Read</Scope>
           <Scope>profile</Scope>
+          <Scope>openid</Scope>
         </Scopes>
       </WebApplicationInfo>
     </VersionOverrides>
