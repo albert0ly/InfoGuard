@@ -38,7 +38,7 @@
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
       <Requirements>
-        <bt:Sets DefaultMinVersion="1.4">
+        <bt:Sets DefaultMinVersion="1.8">
           <bt:Set Name="Mailbox"/>
         </bt:Sets>
       </Requirements>
@@ -170,6 +170,23 @@
                       <FunctionName>action</FunctionName>
                     </Action>
                   </Control>
+
+                  <Control xsi:type="Button" id="AddHeaderButton">
+                    <Label resid="AddHeaderButton.Label"/>
+                    <Supertip>
+                      <Title resid="AddHeaderButton.Label"/>
+                      <Description resid="AddHeaderButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>addSecureHeader</FunctionName>
+                    </Action>
+                  </Control>
+
                 </Group>
                 <Label resid="CustomTabLabel"/>
               </CustomTab>
@@ -194,11 +211,13 @@
           <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
           <bt:String id="ActionButton.Label" DefaultValue="Perform an action"/>
           <bt:String id="ContextMenuButton.Label" DefaultValue="InfoGuard"/>
+          <bt:String id="AddHeaderButton.Label" DefaultValue="Add Header"/>
         </bt:ShortStrings>
         <bt:LongStrings>
           <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a pane displaying all available properties."/>
           <bt:String id="ActionButton.Tooltip" DefaultValue="Perform an action when clicked."/>
           <bt:String id="ContextMenuButton.Tooltip" DefaultValue="Open InfoGuard task pane"/>
+          <bt:String id="AddHeaderButton.Tooltip" DefaultValue="Add X-Secure-Send header to email"/> 
         </bt:LongStrings>
       </Resources>
       <WebApplicationInfo>
@@ -207,6 +226,7 @@
         <Scopes>
           <Scope>User.Read</Scope>
           <Scope>profile</Scope>
+          <Scope>openid</Scope>
         </Scopes>
       </WebApplicationInfo>
     </VersionOverrides>
