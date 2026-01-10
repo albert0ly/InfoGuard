@@ -49,7 +49,7 @@
             
             <!-- READ MODE -->
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
-              <OfficeTab id="TabDefault">
+              <CustomTab id="TabInfoGuardRead">
                 <Group id="msgReadGroup">
                   <Label resid="GroupLabel"/>
                   <Control xsi:type="Button" id="msgReadOpenPaneButton">
@@ -83,12 +83,13 @@
                     </Action>
                   </Control>
                 </Group>
-              </OfficeTab>
+                <Label resid="CustomTabLabel"/>
+              </CustomTab>
             </ExtensionPoint>
             
-            <!-- COMPOSE MODE - ADDED -->
+            <!-- COMPOSE MODE -->
             <ExtensionPoint xsi:type="MessageComposeCommandSurface">
-              <OfficeTab id="TabDefault">
+              <CustomTab id="TabInfoGuardCompose">
                 <Group id="msgComposeGroup">
                   <Label resid="GroupLabel"/>
                   <Control xsi:type="Button" id="msgComposeOpenPaneButton">
@@ -122,7 +123,8 @@
                     </Action>
                   </Control>
                 </Group>
-              </OfficeTab>
+                <Label resid="CustomTabLabel"/>
+              </CustomTab>
             </ExtensionPoint>
             
           </DesktopFormFactor>
@@ -139,7 +141,8 @@
           <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
-          <bt:String id="GroupLabel" DefaultValue="Contoso Add-in"/>
+          <bt:String id="CustomTabLabel" DefaultValue="InfoGuard"/>
+          <bt:String id="GroupLabel" DefaultValue="My Tools"/>
           <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
           <bt:String id="ActionButton.Label" DefaultValue="Perform an action"/>
         </bt:ShortStrings>
