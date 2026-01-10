@@ -75,6 +75,54 @@
         </div>
         <p><label id="message-area"></label></p>
     </main>
-</body>
 
+    <!-- Theme helper: detect Office host theme and apply a class when host is dark -->
+    <script>
+      (function () {
+        function hexToRgb(hex) {
+          if (!hex) return null;
+          hex = hex.replace('#', '');
+          if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+          var int = parseInt(hex, 16);
+          return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+        }
+        function luminance(c) {
+          var srgb = [c.r / 255, c.g / 255, c.b / 255].map(function (v) {
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+          });
+          return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+        }
+
+        function applyHostTheme(theme) {
+          try {
+            if (!theme || !theme.bodyBackgroundColor) return;
+            var rgb = hexToRgb(theme.bodyBackgroundColor);
+            if (!rgb) return;
+            if (luminance(rgb) < 0.15) {
+              document.body.classList.add('host-theme-dark');
+            } else {
+              document.body.classList.remove('host-theme-dark');
+            }
+          } catch (e) {
+            // fail silently
+          }
+        }
+
+        if (window.Office && Office.onReady) {
+          Office.onReady(function () {
+            try {
+              if (Office.context && Office.context.officeTheme) {
+                applyHostTheme(Office.context.officeTheme);
+              }
+              // Some hosts provide an event; attempt to subscribe if available
+              if (Office.context && Office.context.officeTheme && Office.context.officeTheme.addHandlerAsync) {
+                Office.context.officeTheme.addHandlerAsync('changed', function (evt) { applyHostTheme(Office.context.officeTheme); });
+              }
+            } catch (e) {
+              // ignore
+            }
+          });
+        }
+      })();
+    </script>
 </html>

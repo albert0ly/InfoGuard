@@ -3,13 +3,38 @@
  * See LICENSE in the project root for license information.
  */
 
- html,
- body {
-     width: 100%;
-     height: 100%;
-     margin: 0;
-     padding: 0;
- }
+:root {
+  /* Taskpane design tokens (light, readable defaults) */
+  --ig-bg: #ffffff;
+  --ig-text: #201f1e;
+  --ig-subtext: #605e5c;
+  --ig-accent: #0078d7;
+  --ig-header-bg: #f3f2f1;
+  --ig-header-text: var(--ig-text);
+  --ig-button-bg: var(--ig-accent);
+  --ig-button-text: #ffffff;
+}
+
+/* Ensure the taskpane is readable even when the host is in a dark/black theme */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--ig-bg) !important;
+  color: var(--ig-text) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* If we detect the host is dark, this class forces light, readable values */
+.host-theme-dark {
+  --ig-bg: #ffffff;
+  --ig-text: #201f1e;
+  --ig-header-bg: #ffffff;
+  --ig-accent: #0078d7;
+} 
  
  ul {
      margin: 0;
@@ -25,7 +50,56 @@
     -webkit-flex-direction: column;
     flex-direction: column;
     align-items: center;
+    background-color: var(--ig-header-bg) !important;
+    color: var(--ig-header-text);
+    -webkit-print-color-adjust: exact;
  }
+
+ /* Ensure readable text and accessible buttons/icons */
+ .ms-welcome__features.ms-List .ms-ListItem span,
+ .ms-firstrun-instructionstep__header h2,
+ .ms-firstrun-instructionstep__welcome-body p,
+ .ms-firstrun-instructionstep__list .ms-ListItem span,
+ label#message-area {
+   color: var(--ig-text);
+ }
+
+ .ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
+   color: var(--ig-accent);
+ }
+
+ .ms-Button.ms-Button--primary,
+ .popupButton.ms-Button.ms-Button--primary {
+   background-color: var(--ig-button-bg) !important;
+   color: var(--ig-button-text) !important;
+   border: none;
+   box-shadow: none;
+ }
+
+ .ms-Button.ms-Button--primary .ms-Button-label {
+   color: var(--ig-button-text) !important;
+ }
+
+ .ms-Button.ms-Button--primary:hover,
+ .ms-Button.ms-Button--primary:focus {
+   background-color: #005a9e !important;
+   cursor: pointer;
+   outline: 2px solid #005a9e;
+   outline-offset: 2px;
+ }
+
+ @media (forced-colors: active) {
+   :root {
+     color: WindowText;
+     background: Window;
+   }
+   .ms-Button.ms-Button--primary {
+     forced-color-adjust: none;
+     background-color: ButtonFace;
+     color: ButtonText;
+     border: 1px solid ButtonText;
+   }
+ } 
 
  .ms-welcome__main {
     display: -webkit-flex;
