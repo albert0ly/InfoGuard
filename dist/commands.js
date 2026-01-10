@@ -104,6 +104,67 @@ function addSecureHeader(event) {
 
 // Register the function
 Office.actions.associate("addSecureHeader", addSecureHeader);
+function toggleSecureHeader(event) {
+  var item = Office.context.mailbox.item;
+
+  // Load custom properties to check current state
+  item.loadCustomPropertiesAsync(function (result) {
+    var customProps = result.value;
+    var isEnabled = customProps.get("SecureHeaderEnabled") === "true";
+    if (isEnabled) {
+      // Currently enabled, so DISABLE it
+      item.internetHeaders.removeAsync(["X-Secure-Send"], function (asyncResult) {
+        if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+          customProps.set("SecureHeaderEnabled", "false");
+          customProps.saveAsync(function () {
+            showNotification("Header Disabled", "X-Secure-Send header removed");
+            item.notificationMessages.removeAsync("secureHeaderInfo");
+            event.completed();
+          });
+        } else {
+          showNotification("Error", asyncResult.error.message, "errorMessage");
+          event.completed();
+        }
+      });
+    } else {
+      // Currently disabled, so ENABLE it
+      item.internetHeaders.setAsync({
+        "X-Secure-Send": "1"
+      }, function (asyncResult) {
+        if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+          customProps.set("SecureHeaderEnabled", "true");
+          customProps.saveAsync(function () {
+            showNotification("Header Enabled", "X-Secure-Send header will be added");
+
+            // Show persistent info bar
+            item.notificationMessages.addAsync("secureHeaderInfo", {
+              type: "informationalMessage",
+              message: "✓ Secure Send is ENABLED for this email",
+              icon: "Icon.16x16",
+              persistent: true
+            });
+            event.completed();
+          });
+        } else {
+          showNotification("Error", asyncResult.error.message, "errorMessage");
+          event.completed();
+        }
+      });
+    }
+  });
+}
+function showNotification(title, message) {
+  var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "informationalMessage";
+  Office.context.mailbox.item.notificationMessages.addAsync("headerNotification", {
+    type: type,
+    message: message,
+    icon: "Icon.16x16",
+    persistent: true
+  });
+}
+
+// Register the toggle function
+Office.actions.associate("toggleSecureHeader", toggleSecureHeader);
 /******/ })()
 ;
 //# sourceMappingURL=commands.js.map
