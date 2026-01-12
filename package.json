@@ -8,8 +8,8 @@
     "dev_server_port": 3000
   },
   "scripts": {
-    "build": "webpack --mode production",
-    "build:dev": "webpack --mode development",
+    "build": "node scripts/generate-version.js && webpack --mode production",
+    "build:dev": "node scripts/generate-version.js && webpack --mode development",
     "configure-sso": "office-addin-sso configure manifest.xml",
     "dev-server": "node --inspect=localhost:8080 dist/middletier.js",
     "lint": "office-addin-lint check",

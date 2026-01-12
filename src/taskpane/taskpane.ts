@@ -6,6 +6,7 @@
 /* global document, Office */
 
 import { getUserData, getGraphToken } from "../helpers/sso-helper";
+import { APP_VERSION, GIT_COMMIT } from "../helpers/version";
 
 interface Recipient {
   no: number;
@@ -21,6 +22,9 @@ Office.onReady((info) => {
     
     // Initialize secure toggle button icon
     initializeSecureToggle();
+    
+    // Display version info
+    displayVersionInfo();
     
     // Auto-load recipients when task pane opens (if composing)
     if (Office.context.mailbox.item) {
@@ -336,4 +340,23 @@ function toggleSecureSend() {
   
   // Future: Add header logic here
   console.log('Secure send toggled:', newState);
+}
+
+// ============================================
+// Version Display
+// ============================================
+
+function displayVersionInfo() {
+  const versionEl = document.getElementById("app-version");
+  const gitCommitEl = document.getElementById("git-commit");
+  const gitCommitContainer = document.getElementById("git-commit-container");
+  
+  // Display version
+  versionEl.textContent = APP_VERSION;
+  
+  // Display git commit if available
+  if (GIT_COMMIT && GIT_COMMIT !== "dev") {
+    gitCommitEl.textContent = GIT_COMMIT.substring(0, 7); // Short hash
+    gitCommitContainer.style.display = "flex";
+  }
 }

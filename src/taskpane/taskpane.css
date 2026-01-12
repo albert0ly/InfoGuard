@@ -482,3 +482,37 @@ b {
   color: var(--ig-text);
   transition: color 0.3s ease;
 }
+
+/* ============================================ */
+/* Version Footer                               */
+/* ============================================ */
+
+.ig-version-footer {
+  padding: 12px 20px;
+  background-color: var(--ig-header-bg);
+  border-top: 1px solid var(--ig-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--ig-subtext);
+  margin-top: auto;
+}
+
+.ig-version-info {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.ig-version-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ig-version-value {
+  font-family: 'Consolas', 'Courier New', monospace;
+  color: var(--ig-accent);
+  font-weight: 500;
+}

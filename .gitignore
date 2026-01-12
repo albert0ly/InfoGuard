@@ -79,3 +79,5 @@ dist/**/*.css
 # Keep lock file if desired - uncomment if you prefer to ignore
 # package-lock.json
 # yarn.lock
+
+src/helpers/version.ts

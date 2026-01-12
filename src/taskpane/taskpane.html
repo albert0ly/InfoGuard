@@ -60,6 +60,7 @@
                         <div class="ig-list-cell ig-cell-no">No.</div>
                         <div class="ig-list-cell ig-cell-email">Email</div>
                         <div class="ig-list-cell ig-cell-mobile">Mobile Number</div>
+                        <div class="ig-list-cell ig-cell-status"></div>
                     </div>
                     <div id="recipients-body" class="ig-list-body">
                         <!-- Recipients will be inserted here -->
@@ -93,6 +94,18 @@
         </section>
 
         <p><label id="message-area"></label></p>
+        
+        <!-- Version Footer -->
+        <footer class="ig-version-footer">
+            <div class="ig-version-info">
+                <span class="ig-version-label">Version:</span>
+                <span id="app-version" class="ig-version-value">Loading...</span>
+            </div>
+            <div class="ig-version-info" id="git-commit-container" style="display: none;">
+                <span class="ig-version-label">Commit:</span>
+                <span id="git-commit" class="ig-version-value">-</span>
+            </div>
+        </footer>
     </main>
 
     <!-- Theme helper: detect Office host theme and apply a class when host is dark -->
