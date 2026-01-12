@@ -17,6 +17,10 @@ Office.onReady((info) => {
   if (info.host === Office.HostType.Outlook) {
     document.getElementById("getProfileButton").onclick = run;
     document.getElementById("loadRecipientsButton").onclick = loadRecipients;
+    document.getElementById("secureToggle").onclick = toggleSecureSend;
+    
+    // Initialize secure toggle button icon
+    initializeSecureToggle();
     
     // Auto-load recipients when task pane opens (if composing)
     if (Office.context.mailbox.item) {
@@ -176,20 +180,101 @@ function displayRecipients(recipients: Recipient[]) {
     const row = document.createElement("div");
     row.className = "ig-list-row";
     
-    const mobileDisplay = recipient.mobile 
-      ? `<span class="ig-mobile-badge"><i class="ms-Icon ms-Icon--Phone"></i>${recipient.mobile}</span>`
-      : `<span style="color: #a19f9d;">N/A</span>`;
+    // Create mobile input with validation
+    const mobileInputId = `mobile-${recipient.no}`;
+    const mobileValue = recipient.mobile || '';
+    const isValid = mobileValue ? validateIsraeliMobile(mobileValue) : null;
+    const statusIcon = getStatusIcon(isValid);
     
     row.innerHTML = `
       <div class="ig-list-cell ig-cell-no">${recipient.no}</div>
       <div class="ig-list-cell ig-cell-email" title="${recipient.email}">${recipient.email}</div>
-      <div class="ig-list-cell ig-cell-mobile">${mobileDisplay}</div>
+      <div class="ig-list-cell ig-cell-mobile">
+        <div class="ig-mobile-input-wrapper">
+          <input 
+            type="tel" 
+            id="${mobileInputId}"
+            class="ig-mobile-input ${isValid === false ? 'invalid' : ''}" 
+            value="${mobileValue}"
+            placeholder="05X-XXXXXXX"
+            data-email="${recipient.email}"
+          />
+        </div>
+      </div>
+      <div class="ig-list-cell ig-cell-status">
+        <i class="ms-Icon ms-Icon--${statusIcon.icon} ig-status-icon ${statusIcon.class}"></i>
+      </div>
     `;
     
     tbody.appendChild(row);
+    
+    // Add event listener for validation
+    const input = document.getElementById(mobileInputId) as HTMLInputElement;
+    input.addEventListener('input', (e) => validateMobileInput(e.target as HTMLInputElement));
+    input.addEventListener('blur', (e) => validateMobileInput(e.target as HTMLInputElement));
   });
 
   showRecipientsList();
+}
+
+// ============================================
+// Israeli Mobile Number Validation
+// ============================================
+
+function validateIsraeliMobile(mobile: string): boolean {
+  if (!mobile) return false;
+  
+  // Remove all non-digit characters
+  const cleaned = mobile.replace(/\D/g, '');
+  
+  // Israeli mobile formats:
+  // 05X-XXXXXXX (10 digits starting with 05)
+  // 972-5X-XXXXXXX (12 digits starting with 972-5)
+  // +972-5X-XXXXXXX (12 digits starting with +972-5)
+  
+  // Check for Israeli mobile: starts with 05 and has 10 digits
+  if (cleaned.length === 10 && cleaned.startsWith('05')) {
+    return true;
+  }
+  
+  // Check for international format: +972-5X or 972-5X
+  if (cleaned.length === 12 && cleaned.startsWith('9725')) {
+    return true;
+  }
+  
+  return false;
+}
+
+function validateMobileInput(input: HTMLInputElement) {
+  const value = input.value.trim();
+  const statusCell = input.closest('.ig-list-row').querySelector('.ig-cell-status');
+  const statusIcon = statusCell.querySelector('.ig-status-icon');
+  
+  if (!value) {
+    // Empty - neutral state
+    input.classList.remove('invalid');
+    statusIcon.className = 'ms-Icon ms-Icon--StatusCircleQuestionMark ig-status-icon empty';
+    return;
+  }
+  
+  const isValid = validateIsraeliMobile(value);
+  
+  if (isValid) {
+    input.classList.remove('invalid');
+    statusIcon.className = 'ms-Icon ms-Icon--CheckMark ig-status-icon valid';
+  } else {
+    input.classList.add('invalid');
+    statusIcon.className = 'ms-Icon ms-Icon--StatusErrorFull ig-status-icon invalid';
+  }
+}
+
+function getStatusIcon(isValid: boolean | null): { icon: string; class: string } {
+  if (isValid === null) {
+    return { icon: 'StatusCircleQuestionMark', class: 'empty' };
+  }
+  return isValid 
+    ? { icon: 'CheckMark', class: 'valid' }
+    : { icon: 'StatusErrorFull', class: 'invalid' };
 }
 
 // UI Helper Functions
@@ -212,4 +297,43 @@ function showRecipientsList() {
 
 function hideRecipientsList() {
   document.getElementById("recipients-list").style.display = "none";
+}
+
+// ============================================
+// Secure Send Toggle
+// ============================================
+
+function initializeSecureToggle() {
+  const button = document.getElementById("secureToggle") as HTMLButtonElement;
+  const icon = button.querySelector(".ig-toggle-icon");
+  const label = button.querySelector(".ig-toggle-label");
+  
+  // Set initial state (not secure)
+  button.setAttribute("aria-pressed", "false");
+  icon.innerHTML = '🔓'; // Unlocked icon
+  label.textContent = 'Not Secure';
+}
+
+function toggleSecureSend() {
+  const button = document.getElementById("secureToggle") as HTMLButtonElement;
+  const icon = button.querySelector(".ig-toggle-icon");
+  const label = button.querySelector(".ig-toggle-label");
+  
+  const isPressed = button.getAttribute("aria-pressed") === "true";
+  const newState = !isPressed;
+  
+  button.setAttribute("aria-pressed", newState.toString());
+  
+  if (newState) {
+    // Secure mode ON
+    icon.innerHTML = '🔒'; // Lock icon
+    label.textContent = 'Secure Send';
+  } else {
+    // Secure mode OFF
+    icon.innerHTML = '🔓'; // Unlocked icon
+    label.textContent = 'Not Secure';
+  }
+  
+  // Future: Add header logic here
+  console.log('Secure send toggled:', newState);
 }

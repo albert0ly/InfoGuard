@@ -269,7 +269,7 @@ b {
 
 .ig-list-header {
   display: grid;
-  grid-template-columns: 50px 1fr 150px;
+  grid-template-columns: 50px 1fr 180px 40px;
   gap: 8px;
   background-color: var(--ig-header-bg);
   padding: 12px 16px;
@@ -287,7 +287,7 @@ b {
 
 .ig-list-row {
   display: grid;
-  grid-template-columns: 50px 1fr 150px;
+  grid-template-columns: 50px 1fr 180px 40px;
   gap: 8px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--ig-border);
@@ -327,6 +327,61 @@ b {
   font-size: 13px;
 }
 
+.ig-cell-status {
+  justify-content: center;
+}
+
+/* Mobile Number Input */
+.ig-mobile-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.ig-mobile-input {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  border: 1px solid var(--ig-border);
+  border-radius: 2px;
+  background-color: var(--ig-bg);
+  color: var(--ig-text);
+  transition: border-color 0.15s ease;
+}
+
+.ig-mobile-input:focus {
+  outline: none;
+  border-color: var(--ig-accent);
+  box-shadow: 0 0 0 1px var(--ig-accent);
+}
+
+.ig-mobile-input.invalid {
+  border-color: #d13438;
+  background-color: #fef6f6;
+}
+
+.ig-mobile-input::placeholder {
+  color: #a19f9d;
+  font-style: italic;
+}
+
+/* Status Icons */
+.ig-status-icon {
+  font-size: 16px;
+}
+
+.ig-status-icon.valid {
+  color: #107c10;
+}
+
+.ig-status-icon.invalid {
+  color: #d13438;
+}
+
+.ig-status-icon.empty {
+  color: #a19f9d;
+}
+
 /* Mobile Badge (if phone exists) */
 .ig-mobile-badge {
   display: inline-flex;
@@ -343,7 +398,7 @@ b {
 @media (max-width: 480px) {
   .ig-list-header,
   .ig-list-row {
-    grid-template-columns: 40px 1fr 120px;
+    grid-template-columns: 40px 1fr 140px 40px;
     gap: 4px;
     padding: 10px 12px;
   }
@@ -351,4 +406,79 @@ b {
   .ig-list-cell {
     font-size: 13px;
   }
+}
+
+/* ============================================ */
+/* Secure Send Toggle Section                  */
+/* ============================================ */
+
+.ig-secure-section {
+  background: linear-gradient(135deg, #f3f2f1 0%, #ffffff 100%);
+  border-bottom: none;
+}
+
+.ig-secure-toggle-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.ig-secure-info {
+  flex: 1;
+}
+
+.ig-toggle-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border: 2px solid var(--ig-border);
+  border-radius: 8px;
+  background-color: var(--ig-bg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.ig-toggle-button:hover {
+  border-color: var(--ig-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ig-toggle-button:active {
+  transform: translateY(0);
+}
+
+.ig-toggle-button[aria-pressed="true"] {
+  background: linear-gradient(135deg, #0078d7 0%, #005a9e 100%);
+  border-color: #005a9e;
+  color: white;
+}
+
+.ig-toggle-button[aria-pressed="true"] .ig-toggle-label {
+  color: white;
+}
+
+.ig-toggle-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  transition: transform 0.3s ease;
+}
+
+.ig-toggle-button:hover .ig-toggle-icon {
+  transform: scale(1.1);
+}
+
+.ig-toggle-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ig-text);
+  transition: color 0.3s ease;
 }
