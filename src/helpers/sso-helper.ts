@@ -67,3 +67,23 @@ function handleAADErrors(response: any, callback: any): void {
     dialogFallback(callback);
   }
 }
+
+export async function getGraphToken(): Promise<string> {
+  // Get SSO token
+  const ssoToken = await Office.context.auth.getAccessToken({
+    allowSignInPrompt: true,
+    allowConsentPrompt: true
+  });
+
+  // Exchange for Graph token via backend
+  const response = await fetch('/getGraphToken', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${ssoToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+  return data.access_token;
+}

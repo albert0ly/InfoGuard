@@ -13,6 +13,8 @@
   --ig-header-text: var(--ig-text);
   --ig-button-bg: var(--ig-accent);
   --ig-button-text: #ffffff;
+  --ig-border: #edebe9;
+  --ig-hover-bg: #f3f2f1;
 }
 
 /* Ensure the taskpane is readable even when the host is in a dark/black theme */
@@ -36,122 +38,133 @@ body {
   --ig-accent: #0078d7;
 } 
  
- ul {
-     margin: 0;
-     padding: 0;
- }
- 
- .ms-welcome__header {
-    padding: 20px;
-    padding-bottom: 10px;
-    padding-top: 10px;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    align-items: center;
-    background-color: var(--ig-header-bg) !important;
-    color: var(--ig-header-text);
-    -webkit-print-color-adjust: exact;
- }
+ul {
+  margin: 0;
+  padding: 0;
+}
 
- /* Ensure readable text and accessible buttons/icons */
- .ms-welcome__features.ms-List .ms-ListItem span,
- .ms-firstrun-instructionstep__header h2,
- .ms-firstrun-instructionstep__welcome-body p,
- .ms-firstrun-instructionstep__list .ms-ListItem span,
- label#message-area {
-   color: var(--ig-text);
- }
+.ms-welcome__header {
+  padding: 20px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--ig-header-bg) !important;
+  color: var(--ig-header-text);
+  -webkit-print-color-adjust: exact;
+}
 
- .ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
-   color: var(--ig-accent);
- }
+/* Ensure readable text and accessible buttons/icons */
+.ms-welcome__features.ms-List .ms-ListItem span,
+.ms-firstrun-instructionstep__header h2,
+.ms-firstrun-instructionstep__welcome-body p,
+.ms-firstrun-instructionstep__list .ms-ListItem span,
+label#message-area {
+  color: var(--ig-text);
+}
 
- .ms-Button.ms-Button--primary,
- .popupButton.ms-Button.ms-Button--primary {
-   background-color: var(--ig-button-bg) !important;
-   color: var(--ig-button-text) !important;
-   border: none;
-   box-shadow: none;
- }
+.ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
+  color: var(--ig-accent);
+}
 
- .ms-Button.ms-Button--primary .ms-Button-label {
-   color: var(--ig-button-text) !important;
- }
+.ms-Button.ms-Button--primary,
+.popupButton.ms-Button.ms-Button--primary {
+  background-color: var(--ig-button-bg) !important;
+  color: var(--ig-button-text) !important;
+  border: none;
+  box-shadow: none;
+}
 
- .ms-Button.ms-Button--primary:hover,
- .ms-Button.ms-Button--primary:focus {
-   background-color: #005a9e !important;
-   cursor: pointer;
-   outline: 2px solid #005a9e;
-   outline-offset: 2px;
- }
+.ms-Button.ms-Button--primary .ms-Button-label {
+  color: var(--ig-button-text) !important;
+}
 
- @media (forced-colors: active) {
-   :root {
-     color: WindowText;
-     background: Window;
-   }
-   .ms-Button.ms-Button--primary {
-     forced-color-adjust: none;
-     background-color: ButtonFace;
-     color: ButtonText;
-     border: 1px solid ButtonText;
-   }
- } 
+.ms-Button.ms-Button--primary:hover,
+.ms-Button.ms-Button--primary:focus {
+  background-color: #005a9e !important;
+  cursor: pointer;
+  outline: 2px solid #005a9e;
+  outline-offset: 2px;
+}
 
- .ms-welcome__main {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    -webkit-flex-wrap: nowrap;
-    flex-wrap: nowrap;
-    -webkit-align-items: center;
-    align-items: center;
-    -webkit-flex: 1 0 0;
-    flex: 1 0 0;
-    padding: 10px 20px;
- }
- 
- .ms-welcome__main > h2 {
-     width: 100%;
-     text-align: center;
- }
- 
- .ms-welcome__features {
-     list-style-type: none;
-     margin-top: 10px;
- }
+.ms-Button.ms-Button--default {
+  background-color: transparent;
+  color: var(--ig-accent);
+  border: 1px solid var(--ig-border);
+}
 
- .ms-firstrun-instructionstep__header {
-   padding-left: 20px;
- }
+.ms-Button.ms-Button--default:hover {
+  background-color: var(--ig-hover-bg);
+  cursor: pointer;
+}
 
- .ms-firstrun-instructionstep__welcome-body {
-   padding-left: 20px;
- }
+@media (forced-colors: active) {
+  :root {
+    color: WindowText;
+    background: Window;
+  }
+  .ms-Button.ms-Button--primary {
+    forced-color-adjust: none;
+    background-color: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+} 
 
- .ms-firstrun-instructionstep__list {
-   padding-left: 20px;
- }
- 
- .ms-welcome__features.ms-List .ms-ListItem {
-     padding-left: 20px;
-     padding-bottom: 10px;
-     display: -webkit-flex;
-     display: flex;
- }
- 
- .ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
-     margin-right: 10px;
- }
- 
- .ms-welcome__action.ms-Button--hero {
-     margin-top: 30px;
- }
- 
+.ms-welcome__main {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -webkit-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-flex: 1 0 0;
+  flex: 1 0 0;
+  padding: 10px 20px;
+}
+
+.ms-welcome__main > h2 {
+  width: 100%;
+  text-align: center;
+}
+
+.ms-welcome__features {
+  list-style-type: none;
+  margin-top: 10px;
+}
+
+.ms-firstrun-instructionstep__header {
+  padding-left: 20px;
+}
+
+.ms-firstrun-instructionstep__welcome-body {
+  padding-left: 20px;
+}
+
+.ms-firstrun-instructionstep__list {
+  padding-left: 20px;
+}
+
+.ms-welcome__features.ms-List .ms-ListItem {
+  padding-left: 20px;
+  padding-bottom: 10px;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
+  margin-right: 10px;
+}
+
+.ms-welcome__action.ms-Button--hero {
+  margin-top: 30px;
+}
+
 .ms-Button.ms-Button--hero .ms-Button-label {
   color: #0078d7;
 }
@@ -163,5 +176,179 @@ body {
 }
 
 b {
-    font-weight: bold;
+  font-weight: bold;
+}
+
+/* ============================================ */
+/* InfoGuard Custom Styles - Recipients Table  */
+/* ============================================ */
+
+.ig-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--ig-border);
+}
+
+.ig-section-title {
+  margin: 0 0 10px 0;
+  color: var(--ig-text);
+  font-weight: 600;
+}
+
+.ig-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.ig-section-header .ms-Button {
+  margin-left: auto;
+}
+
+.ig-divider {
+  height: 1px;
+  background-color: var(--ig-border);
+  margin: 0;
+}
+
+.ig-subtext {
+  color: var(--ig-subtext);
+}
+
+/* Loading State */
+.ig-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--ig-subtext);
+}
+
+.ms-Spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--ig-border);
+  border-top-color: var(--ig-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.ig-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ig-subtext);
+}
+
+.ig-empty-state .ms-Icon {
+  color: var(--ig-subtext);
+  margin-bottom: 12px;
+}
+
+.ig-empty-state p {
+  margin: 4px 0;
+}
+
+/* Recipients List (Fluent UI inspired) */
+.ig-recipients-list {
+  width: 100%;
+  border: 1px solid var(--ig-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ig-list-header {
+  display: grid;
+  grid-template-columns: 50px 1fr 150px;
+  gap: 8px;
+  background-color: var(--ig-header-bg);
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--ig-text);
+  border-bottom: 1px solid var(--ig-border);
+}
+
+.ig-list-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.ig-list-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 150px;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ig-border);
+  transition: background-color 0.15s ease;
+}
+
+.ig-list-row:hover {
+  background-color: var(--ig-hover-bg);
+}
+
+.ig-list-row:last-child {
+  border-bottom: none;
+}
+
+.ig-list-cell {
+  display: flex;
+  align-items: center;
+  color: var(--ig-text);
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ig-cell-no {
+  color: var(--ig-subtext);
+  font-weight: 600;
+}
+
+.ig-cell-email {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ig-cell-mobile {
+  color: var(--ig-subtext);
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+/* Mobile Badge (if phone exists) */
+.ig-mobile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ig-mobile-badge .ms-Icon {
+  color: var(--ig-accent);
+  font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .ig-list-header,
+  .ig-list-row {
+    grid-template-columns: 40px 1fr 120px;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+  
+  .ig-list-cell {
+    font-size: 13px;
+  }
 }
