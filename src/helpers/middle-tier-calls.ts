@@ -20,3 +20,20 @@ export async function callGetUserData(middletierToken: string): Promise<any> {
     throw err;
   }
 }
+
+export async function callGetRandomMobile(middletierToken: string, email: string): Promise<any> {
+  try {
+    const response = await $.ajax({
+      type: "POST",
+      url: `/randommobile`,
+      headers: { Authorization: "Bearer " + middletierToken },
+      data: JSON.stringify({ email }),
+      contentType: "application/json",
+      cache: false,
+    });
+    return response;
+  } catch (err) {
+    showMessage(`Error from middle tier (random mobile). \n${err.responseText || err.message}`);
+    throw err;
+  }
+}

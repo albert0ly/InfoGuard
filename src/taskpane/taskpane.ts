@@ -5,7 +5,8 @@
 
 /* global document, Office */
 
-import { getUserData, getGraphToken } from "../helpers/sso-helper";
+import { getUserData, getGraphToken, getMiddletierToken } from "../helpers/sso-helper";
+import { callGetRandomMobile } from "../helpers/middle-tier-calls";
 import { APP_VERSION, GIT_COMMIT } from "../helpers/version";
 
 interface Recipient {
@@ -28,7 +29,7 @@ Office.onReady((info) => {
     
     // Auto-load recipients when task pane opens (if composing)
     if (Office.context.mailbox.item) {
-      loadRecipients();
+ //     loadRecipients();
     }
   }
 });
@@ -120,8 +121,8 @@ async function fetchMobileNumbers(recipients: { email: string; type: string }[])
     // Get access token for Microsoft Graph
     const token = await getGraphToken();
 
-    // Fetch mobile numbers for each recipient
-    const recipientsWithMobile = await Promise.all(
+    // First: fetch mobile numbers from Graph for each recipient
+    let recipientsWithMobile = await Promise.all(
       recipients.map(async (recipient, index) => {
         const mobile = await getMobileNumber(recipient.email, token);
         return {
@@ -131,6 +132,35 @@ async function fetchMobileNumbers(recipients: { email: string; type: string }[])
         };
       })
     );
+
+    // Filter those without a mobile and call our middle-tier API to get a random mobile
+    const missing = recipientsWithMobile.filter(r => !r.mobile);
+    if (missing.length > 0) {
+      try {
+        // Get SSO token to present to middle-tier
+        const middletierToken = await getMiddletierToken();
+
+        const randomResults = await Promise.all(
+          missing.map(async (r) => {
+            try {
+              const res = await callGetRandomMobile(middletierToken, r.email);
+              return { email: r.email, mobile: res && res.mobile ? res.mobile : null };
+            } catch (err) {
+              // If the middle-tier call fails for a particular recipient, leave mobile null
+              console.error(`Error fetching random mobile for ${r.email}:`, err);
+              return { email: r.email, mobile: null };
+            }
+          })
+        );
+
+        // Merge random results back into recipientsWithMobile
+        const randomMap = new Map(randomResults.map(rr => [rr.email, rr.mobile]));
+        recipientsWithMobile = recipientsWithMobile.map(r => ({ ...r, mobile: r.mobile || randomMap.get(r.email) || null }));
+      } catch (err) {
+        console.error("Error getting middletier token or random mobiles:", err);
+        // proceed with what we have (Graph results)
+      }
+    }
 
     displayRecipients(recipientsWithMobile);
   } catch (error) {

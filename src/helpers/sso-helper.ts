@@ -8,13 +8,47 @@ import { callGetUserData } from "./middle-tier-calls";
 import { showMessage } from "./message-helper";
 import { handleClientSideErrors } from "./error-handler";
 
-/* global OfficeRuntime */
+/* global OfficeRuntime, Office */
 
 let retryGetMiddletierToken = 0;
 
+async function getSsoToken(options?: any): Promise<string> {
+  // Try modern OfficeRuntime API first
+  if (typeof OfficeRuntime !== 'undefined' && OfficeRuntime.auth && OfficeRuntime.auth.getAccessToken) {
+    try {
+      return await OfficeRuntime.auth.getAccessToken(options || {});
+    } catch (err) {
+      // fall through to try older API
+      console.warn('OfficeRuntime.auth.getAccessToken failed, trying Office.context.auth...', err);
+    }
+  }
+
+  // Fallback to older callback-based Office.context.auth.getAccessToken
+  if (typeof Office !== 'undefined' && Office.context && Office.context.auth && typeof Office.context.auth.getAccessToken === 'function') {
+    return new Promise((resolve, reject) => {
+      try {
+        Office.context.auth.getAccessToken(options || {}, (result: any) => {
+          // result may be an object with .value or .value is token
+          if (result && (result.value || result.Value)) {
+            resolve(result.value || result.Value);
+          } else if (result && result.status && result.status.toLowerCase() === 'succeeded' && result.value) {
+            resolve(result.value);
+          } else {
+            reject(result && result.error ? result.error : new Error('Failed to obtain SSO token'));
+          }
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  throw new Error('No SSO token method available in this host');
+}
+
 export async function getUserData(callback): Promise<void> {
   try {
-    let middletierToken: string = await OfficeRuntime.auth.getAccessToken({
+    let middletierToken: string = await getSsoToken({
       allowSignInPrompt: true,
       allowConsentPrompt: true,
       forMSGraphAccess: true,
@@ -26,7 +60,7 @@ export async function getUserData(callback): Promise<void> {
       // Microsoft Graph requires an additional form of authentication. Have the Office host
       // get a new token using the Claims string, which tells AAD to prompt the user for all
       // required forms of authentication.
-      let mfaMiddletierToken: string = await OfficeRuntime.auth.getAccessToken({
+      let mfaMiddletierToken: string = await getSsoToken({
         authChallenge: response.claims,
       });
       response = callGetUserData(mfaMiddletierToken);
@@ -69,10 +103,11 @@ function handleAADErrors(response: any, callback: any): void {
 }
 
 export async function getGraphToken(): Promise<string> {
-  // Get SSO token
-  const ssoToken = await Office.context.auth.getAccessToken({
+  // Get SSO token (use OfficeRuntime.auth for modern hosts)
+  const ssoToken = await getSsoToken({
     allowSignInPrompt: true,
-    allowConsentPrompt: true
+    allowConsentPrompt: true,
+    forMSGraphAccess: true
   });
 
   // Exchange for Graph token via backend
@@ -86,4 +121,13 @@ export async function getGraphToken(): Promise<string> {
 
   const data = await response.json();
   return data.access_token;
+}
+
+export async function getMiddletierToken(): Promise<string> {
+  // Returns a SSO token that is intended to be presented to the middle-tier
+  const ssoToken = await getSsoToken({
+    allowSignInPrompt: true,
+    allowConsentPrompt: true,
+  });
+  return ssoToken;
 }

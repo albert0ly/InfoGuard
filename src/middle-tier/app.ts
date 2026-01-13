@@ -18,7 +18,7 @@ import express from "express";
 import https from "https";
 import { getHttpsServerOptions } from "office-addin-dev-certs";
 import { getUserData } from "./msgraph-helper";
-import { validateJwt } from "./ssoauth-helper";
+import { validateJwt, getAccessToken } from "./ssoauth-helper";
 
 /* global console, process, require, __dirname */
 
@@ -67,7 +67,50 @@ app.use("/", indexRouter);
 
 //app.get("/getuserdata", validateJwt, getUserData);
 app.get("/getuserdata", validateJwt, getUserData);
+// Exchange SSO assertion for a Microsoft Graph access token and return it to the client
+app.post("/getGraphToken", async (req: any, res: any) => {
+  const authorization: string = req.get("Authorization");
+  try {
+    const tokenResponse = await getAccessToken(authorization);
+    if (tokenResponse && (tokenResponse.claims || tokenResponse.error)) {
+      // Relay the claims or error object back to the client so it can handle MFA or consent prompts
+      res.send(tokenResponse);
+    } else {
+      // Return the access token JSON to the client
+      res.json(tokenResponse);
+    }
+  } catch (err) {
+    res.status(401).send(err.message);
+  }
+});
 
+// New API: return a random Israeli mobile number for the provided email
+// Protected by JWT validation middleware
+app.post("/randommobile", validateJwt, (req: any, res: any) => {
+  const email: string = req.body && req.body.email;
+  // We don't use the email to derive the number — it's just returned for logging/debugging
+  console.log(`Generating random mobile for ${email}`);
+
+  const mobile = generateRandomIsraeliMobile();
+  res.json({ mobile });
+});
+
+function generateRandomIsraeliMobile(): string {
+  // Helper to generate a random digit string of given length
+  const randDigits = (len: number) => Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join("");
+
+  // Choose 0: local (05X-XXXXXXX), 1: 972-5X-XXXXXXX, 2: +972-5X-XXXXXXX
+  const choice = Math.floor(Math.random() * 3);
+  const subscriber = randDigits(7);
+  const operatorDigit = Math.floor(Math.random() * 10).toString();
+
+  if (choice === 0) {
+    return `05${operatorDigit}-${subscriber}`;
+  } else if (choice === 1) {
+    return `972-5${operatorDigit}-${subscriber}`;
+  }
+  return `+972-5${operatorDigit}-${subscriber}`;
+}
 // Get the client side task pane files requested
 app.get("/taskpane.html", async (req: any, res: any) => {
   return res.sendfile("taskpane.html");
