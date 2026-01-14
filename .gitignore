@@ -40,6 +40,9 @@ jest/
 *.sw?
 
 # Environment files
+.ENV
+.ENV.LOCAL
+.ENV.*.LOCAL
 .env
 .env.local
 .env.*.local
@@ -80,4 +83,5 @@ dist/**/*.css
 # package-lock.json
 # yarn.lock
 
-src/helpers/version.ts
+
+version.ts
