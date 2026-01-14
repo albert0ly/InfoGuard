@@ -11,7 +11,7 @@ import { callGetUserData } from "./middle-tier-calls";
 import { showMessage } from "./message-helper";
 //${window.location.host}/
 const clientId = "3f2ae881-21e0-44c7-b806-6b09d7a6e16d"; //This is your client ID
-const accessScope = `api://${clientId}/access_as_user`;
+const accessScope = `api://localhost:3000/${clientId}/access_as_user`;
 const loginRequest: RedirectRequest = {
   scopes: [accessScope],
   extraScopesToConsent: ["user.read"],

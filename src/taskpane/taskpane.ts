@@ -29,7 +29,7 @@ Office.onReady((info) => {
     
     // Auto-load recipients when task pane opens (if composing)
     if (Office.context.mailbox.item) {
- //     loadRecipients();
+      loadRecipients();
     }
   }
 });
@@ -218,10 +218,9 @@ function displayRecipients(recipients: Recipient[]) {
     const mobileInputId = `mobile-${recipient.no}`;
     const mobileValue = recipient.mobile || '';
     const isValid = mobileValue ? validateIsraeliMobile(mobileValue) : null;
-    const statusIcon = getStatusIcon(isValid);
+    // status icon removed in new UI
     
     row.innerHTML = `
-      <div class="ig-list-cell ig-cell-no">${recipient.no}</div>
       <div class="ig-list-cell ig-cell-email" title="${recipient.email}">${recipient.email}</div>
       <div class="ig-list-cell ig-cell-mobile">
         <div class="ig-mobile-input-wrapper">
@@ -235,8 +234,8 @@ function displayRecipients(recipients: Recipient[]) {
           />
         </div>
       </div>
-      <div class="ig-list-cell ig-cell-status">
-        <i class="ms-Icon ms-Icon--${statusIcon.icon} ig-status-icon ${statusIcon.class}"></i>
+      <div class="ig-list-cell ig-cell-actions">
+        <button class="ig-actions-btn" title="More">...</button>
       </div>
     `;
     
@@ -249,6 +248,7 @@ function displayRecipients(recipients: Recipient[]) {
   });
 
   showRecipientsList();
+  clearError();
 }
 
 // ============================================
@@ -281,26 +281,19 @@ function validateIsraeliMobile(mobile: string): boolean {
 
 function validateMobileInput(input: HTMLInputElement) {
   const value = input.value.trim();
-  const statusCell = input.closest('.ig-list-row').querySelector('.ig-cell-status');
-  const statusIcon = statusCell.querySelector('.ig-status-icon');
-  
   if (!value) {
-    // Empty - neutral state
     input.classList.remove('invalid');
-    statusIcon.className = 'ms-Icon ms-Icon--StatusCircleQuestionMark ig-status-icon empty';
     return;
   }
-  
   const isValid = validateIsraeliMobile(value);
-  
   if (isValid) {
     input.classList.remove('invalid');
-    statusIcon.className = 'ms-Icon ms-Icon--CheckMark ig-status-icon valid';
   } else {
     input.classList.add('invalid');
-    statusIcon.className = 'ms-Icon ms-Icon--StatusErrorFull ig-status-icon invalid';
   }
 }
+
+//
 
 function getStatusIcon(isValid: boolean | null): { icon: string; class: string } {
   if (isValid === null) {
@@ -354,22 +347,32 @@ function toggleSecureSend() {
   const label = button.querySelector(".ig-toggle-label");
   
   const isPressed = button.getAttribute("aria-pressed") === "true";
-  const newState = !isPressed;
+  const wantOn = !isPressed;
+
+  if (wantOn) {
+    const ok = validateAllRecipients();
+    if (!ok) {
+      button.setAttribute("aria-pressed", "false");
+      icon.innerHTML = '🔓';
+      label.textContent = 'Not Secure';
+      showError('Cannot enable Secure Send due to validation errors.');
+      return;
+    }
+  } else {
+    clearError();
+  }
   
-  button.setAttribute("aria-pressed", newState.toString());
+  button.setAttribute("aria-pressed", wantOn.toString());
   
-  if (newState) {
-    // Secure mode ON
-    icon.innerHTML = '🔒'; // Lock icon
+  if (wantOn) {
+    icon.innerHTML = '🔒';
     label.textContent = 'Secure Send';
   } else {
-    // Secure mode OFF
-    icon.innerHTML = '🔓'; // Unlocked icon
+    icon.innerHTML = '🔓';
     label.textContent = 'Not Secure';
   }
   
-  // Future: Add header logic here
-  console.log('Secure send toggled:', newState);
+  console.log('Secure send toggled:', wantOn);
 }
 
 // ============================================
@@ -388,5 +391,73 @@ function displayVersionInfo() {
   if (GIT_COMMIT && GIT_COMMIT !== "dev") {
     gitCommitEl.textContent = GIT_COMMIT.substring(0, 7); // Short hash
     gitCommitContainer.style.display = "flex";
+  }
+}
+
+// ============================================
+// Validation and Error Display Functions
+// ============================================
+
+/**
+ * Validates that all recipients have a mobile number
+ * @returns true if all recipients have valid mobile numbers, false otherwise
+ */
+function validateAllRecipients(): boolean {
+  const inputs = document.querySelectorAll('.ig-mobile-input') as NodeListOf<HTMLInputElement>;
+  
+  if (inputs.length === 0) {
+    showError('No recipients found. Please add recipients to enable secure send.');
+    return false;
+  }
+  
+  const invalidRecipients: string[] = [];
+  
+  inputs.forEach(input => {
+    const email = input.getAttribute('data-email');
+    const mobile = input.value.trim();
+    
+    if (!mobile) {
+      invalidRecipients.push(email);
+    } else if (!validateIsraeliMobile(mobile)) {
+      invalidRecipients.push(email);
+    }
+  });
+  
+  if (invalidRecipients.length > 0) {
+    const recipientList = invalidRecipients.join(', ');
+    const message = invalidRecipients.length === 1
+      ? `Missing or invalid mobile number for: ${recipientList}`
+      : `Missing or invalid mobile numbers for ${invalidRecipients.length} recipients: ${recipientList}`;
+    
+    showError(message);
+    return false;
+  }
+  
+  return true;
+}
+
+/**
+ * Displays an error message in the validation error container
+ * @param message - The error message to display
+ */
+function showError(message: string): void {
+  const errorEl = document.getElementById('validation-error');
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+    
+    // Scroll error into view
+    errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/**
+ * Clears the error message from the validation error container
+ */
+function clearError(): void {
+  const errorEl = document.getElementById('validation-error');
+  if (errorEl) {
+    errorEl.textContent = '';
+    errorEl.style.display = 'none';
   }
 }

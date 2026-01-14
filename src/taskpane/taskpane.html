@@ -22,8 +22,8 @@
 
 <body class="ms-font-m ms-welcome ms-Fabric">
     <header class="ms-welcome__header ms-bgColor-neutralLighter">
-        <img width="90" height="90" src="../../assets/logo-filled.png" alt="InfoGuard" title="InfoGuard" />
-        <h1 class="ms-font-su">InfoGuard</h1>
+        <img width="36" height="36" src="../../assets/logo-filled.png" alt="InfoGuard" title="InfoGuard" />
+        <h1 class="ms-font-m">InfoGuard</h1>
     </header>
     
     <main class="ms-firstrun-instructionstep">
@@ -57,10 +57,9 @@
                 <!-- Recipients List (Fluent UI List) -->
                 <div id="recipients-list" class="ig-recipients-list" style="display: none;">
                     <div class="ig-list-header">
-                        <div class="ig-list-cell ig-cell-no">No.</div>
                         <div class="ig-list-cell ig-cell-email">Email</div>
-                        <div class="ig-list-cell ig-cell-mobile">Mobile Number</div>
-                        <div class="ig-list-cell ig-cell-status"></div>
+                        <div class="ig-list-cell ig-cell-mobile">Mobile</div>
+                        <div class="ig-list-cell ig-cell-actions"></div>
                     </div>
                     <div id="recipients-body" class="ig-list-body">
                         <!-- Recipients will be inserted here -->
@@ -76,6 +75,8 @@
         </section>
 
         <div class="ig-divider"></div>
+
+        <div id="validation-error"></div>
 
         <!-- Secure Send Toggle Section -->
         <section class="ig-section ig-secure-section">

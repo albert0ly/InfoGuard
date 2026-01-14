@@ -14,12 +14,14 @@ let retryGetMiddletierToken = 0;
 
 async function getSsoToken(options?: any): Promise<string> {
   // Try modern OfficeRuntime API first
+  let lastError: any = null;
   if (typeof OfficeRuntime !== 'undefined' && OfficeRuntime.auth && OfficeRuntime.auth.getAccessToken) {
     try {
       return await OfficeRuntime.auth.getAccessToken(options || {});
     } catch (err) {
       // fall through to try older API
       console.warn('OfficeRuntime.auth.getAccessToken failed, trying Office.context.auth...', err);
+      lastError = err;
     }
   }
 
@@ -43,7 +45,14 @@ async function getSsoToken(options?: any): Promise<string> {
     });
   }
 
-  throw new Error('No SSO token method available in this host');
+  // If no SSO method is available, throw a standardized error with code 13012 so fallback logic can handle it
+  if (lastError && (lastError.code || lastError.name)) {
+    throw lastError;
+  }
+  const notSupported: any = new Error('API is not supported in this platform.');
+  (notSupported as any).code = 13012;
+  (notSupported as any).name = 'API Not Supported';
+  throw notSupported;
 }
 
 export async function getUserData(callback): Promise<void> {
@@ -51,7 +60,7 @@ export async function getUserData(callback): Promise<void> {
     let middletierToken: string = await getSsoToken({
       allowSignInPrompt: true,
       allowConsentPrompt: true,
-      forMSGraphAccess: true,
+      forMSGraphAccess: false,
     });
     let response: any = await callGetUserData(middletierToken);
     if (!response) {
@@ -107,7 +116,7 @@ export async function getGraphToken(): Promise<string> {
   const ssoToken = await getSsoToken({
     allowSignInPrompt: true,
     allowConsentPrompt: true,
-    forMSGraphAccess: true
+    forMSGraphAccess: false
   });
 
   // Exchange for Graph token via backend
@@ -128,6 +137,7 @@ export async function getMiddletierToken(): Promise<string> {
   const ssoToken = await getSsoToken({
     allowSignInPrompt: true,
     allowConsentPrompt: true,
+    forMSGraphAccess: false
   });
   return ssoToken;
 }
