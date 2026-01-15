@@ -1,205 +1,100 @@
 /* 
- * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
- * See LICENSE in the project root for license information.
+ * InfoGuard Outlook Add-in Styles
+ * Following Office UI Fabric Core design principles
  */
 
 :root {
-  /* Taskpane design tokens (light, readable defaults) */
+  /* Office Fabric Core inspired design tokens */
   --ig-bg: #ffffff;
-  --ig-text: #201f1e;
+  --ig-text: #323130;
   --ig-subtext: #605e5c;
-  --ig-accent: #0078d7;
-  --ig-header-bg: #f3f2f1;
-  --ig-header-text: var(--ig-text);
-  --ig-button-bg: var(--ig-accent);
-  --ig-button-text: #ffffff;
+  --ig-accent: #0078d4;
+  --ig-accent-hover: #106ebe;
   --ig-border: #edebe9;
   --ig-hover-bg: #f3f2f1;
+  --ig-error: #a80000;
+  --ig-error-bg: #fde7e9;
+  --ig-success: #107c10;
+  
+  /* Spacing following 4px grid */
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 12px;
+  --spacing-l: 16px;
+  --spacing-xl: 20px;
+  --spacing-xxl: 24px;
 }
 
-/* Ensure the taskpane is readable even when the host is in a dark/black theme */
+/* Force light theme for readability */
+.host-theme-dark {
+  --ig-bg: #ffffff;
+  --ig-text: #323130;
+  --ig-accent: #0078d4;
+}
+
+/* ============================================ */
+/* Base Layout - Fabric Core Patterns          */
+/* ============================================ */
+
 html,
 body {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
   background-color: var(--ig-bg) !important;
   color: var(--ig-text) !important;
+  font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* If we detect the host is dark, this class forces light, readable values */
-.host-theme-dark {
-  --ig-bg: #ffffff;
-  --ig-text: #201f1e;
-  --ig-header-bg: #ffffff;
-  --ig-accent: #0078d7;
-} 
- 
-ul {
-  margin: 0;
-  padding: 0;
-}
-
-.ms-welcome__header {
-  padding: 8px 12px;
+/* Container with fixed footer */
+.ig-container {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--ig-header-bg) !important;
-  color: var(--ig-header-text);
-  -webkit-print-color-adjust: exact;
-}
-
-/* Ensure readable text and accessible buttons/icons */
-.ms-welcome__features.ms-List .ms-ListItem span,
-.ms-firstrun-instructionstep__header h2,
-.ms-firstrun-instructionstep__welcome-body p,
-.ms-firstrun-instructionstep__list .ms-ListItem span,
-label#message-area {
-  color: var(--ig-text);
-}
-
-.ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
-  color: var(--ig-accent);
-}
-
-.ms-Button.ms-Button--primary,
-.popupButton.ms-Button.ms-Button--primary {
-  background-color: var(--ig-button-bg) !important;
-  color: var(--ig-button-text) !important;
-  border: none;
-  box-shadow: none;
-}
-
-.ms-Button.ms-Button--primary .ms-Button-label {
-  color: var(--ig-button-text) !important;
-}
-
-.ms-Button.ms-Button--primary:hover,
-.ms-Button.ms-Button--primary:focus {
-  background-color: #005a9e !important;
-  cursor: pointer;
-  outline: 2px solid #005a9e;
-  outline-offset: 2px;
-}
-
-.ms-Button.ms-Button--default {
-  background-color: transparent;
-  color: var(--ig-accent);
-  border: 1px solid var(--ig-border);
-}
-
-.ms-Button.ms-Button--default:hover {
-  background-color: var(--ig-hover-bg);
-  cursor: pointer;
-}
-
-@media (forced-colors: active) {
-  :root {
-    color: WindowText;
-    background: Window;
-  }
-  .ms-Button.ms-Button--primary {
-    forced-color-adjust: none;
-    background-color: ButtonFace;
-    color: ButtonText;
-    border: 1px solid ButtonText;
-  }
-} 
-
-.ms-welcome__main {
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-direction: column;
   flex-direction: column;
-  -webkit-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  -webkit-align-items: center;
-  align-items: center;
-  -webkit-flex: 1 0 0;
-  flex: 1 0 0;
-  padding: 10px 20px;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.ms-welcome__main > h2 {
-  width: 100%;
-  text-align: center;
+/* Scrollable content area */
+.ig-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
-.ms-welcome__features {
-  list-style-type: none;
-  margin-top: 10px;
-}
-
-.ms-firstrun-instructionstep__header {
-  padding-left: 20px;
-}
-
-.ms-firstrun-instructionstep__welcome-body {
-  padding-left: 20px;
-}
-
-.ms-firstrun-instructionstep__list {
-  padding-left: 20px;
-}
-
-.ms-welcome__features.ms-List .ms-ListItem {
-  padding-left: 20px;
-  padding-bottom: 10px;
-  display: -webkit-flex;
-  display: flex;
-}
-
-.ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
-  margin-right: 10px;
-}
-
-.ms-welcome__action.ms-Button--hero {
-  margin-top: 30px;
-}
-
-.ms-Button.ms-Button--hero .ms-Button-label {
-  color: #0078d7;
-}
-
-.ms-Button.ms-Button--hero:hover .ms-Button-label,
-.ms-Button.ms-Button--hero:focus .ms-Button-label{
-  color: #005a9e;
-  cursor: pointer;
-}
-
-b {
-  font-weight: bold;
+/* Fixed footer */
+.ig-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--ig-border);
+  background-color: var(--ig-bg);
 }
 
 /* ============================================ */
-/* InfoGuard Custom Styles - Recipients Table  */
+/* Sections - Following Fabric spacing         */
 /* ============================================ */
 
 .ig-section {
-  padding: 20px;
-  border-bottom: 1px solid var(--ig-border);
+  padding: var(--spacing-xl) var(--spacing-l);
 }
 
 .ig-section-title {
-  margin: 0 0 10px 0;
+  margin: 0 0 var(--spacing-m) 0;
   color: var(--ig-text);
   font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
 }
 
 .ig-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-}
-
-.ig-section-header .ms-Button {
-  margin-left: auto;
+  margin-bottom: var(--spacing-l);
+  gap: var(--spacing-m);
 }
 
 .ig-divider {
@@ -210,15 +105,89 @@ b {
 
 .ig-subtext {
   color: var(--ig-subtext);
+  font-size: 12px;
+  line-height: 16px;
+  margin: 0;
 }
 
-/* Loading State */
+/* ============================================ */
+/* Buttons - Fabric Core Button Styles         */
+/* ============================================ */
+
+.ms-Button {
+  font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  height: 32px;
+  min-width: 80px;
+  padding: 0 var(--spacing-l);
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-s);
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.ms-Button-label {
+  font-weight: 600;
+}
+
+/* Primary Button */
+.ms-Button--primary {
+  background-color: var(--ig-accent);
+  border-color: var(--ig-accent);
+  color: #ffffff;
+}
+
+.ms-Button--primary:hover {
+  background-color: var(--ig-accent-hover);
+  border-color: var(--ig-accent-hover);
+}
+
+.ms-Button--primary:active {
+  background-color: #005a9e;
+  border-color: #005a9e;
+}
+
+/* Default Button */
+.ms-Button--default {
+  background-color: transparent;
+  border-color: var(--ig-border);
+  color: var(--ig-text);
+}
+
+.ms-Button--default:hover {
+  background-color: var(--ig-hover-bg);
+  border-color: #8a8886;
+}
+
+.ms-Button--default:active {
+  background-color: #edebe9;
+}
+
+/* Full width button */
+.ig-full-width-button {
+  width: 100%;
+}
+
+/* Icon button styling */
+.ig-icon-button .ms-Icon {
+  font-size: 14px;
+}
+
+/* ============================================ */
+/* Loading State - Fabric Core Spinner         */
+/* ============================================ */
+
 .ig-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: var(--spacing-xxl) var(--spacing-l);
   color: var(--ig-subtext);
 }
 
@@ -229,34 +198,40 @@ b {
   border-top-color: var(--ig-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-m);
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Empty State */
+/* ============================================ */
+/* Empty State                                  */
+/* ============================================ */
+
 .ig-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: var(--spacing-xxl) var(--spacing-l);
   text-align: center;
   color: var(--ig-subtext);
 }
 
 .ig-empty-state .ms-Icon {
   color: var(--ig-subtext);
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-m);
 }
 
 .ig-empty-state p {
-  margin: 4px 0;
+  margin: var(--spacing-xs) 0;
 }
 
-/* Recipients List (Fluent UI inspired) */
+/* ============================================ */
+/* Recipients List - Fabric Core List Pattern  */
+/* ============================================ */
+
 .ig-recipients-list {
   width: 100%;
   border: 1px solid var(--ig-border);
@@ -264,31 +239,20 @@ b {
   overflow: hidden;
 }
 
-.ig-list-header {
-  display: grid;
-  grid-template-columns: 1fr 130px 36px;
-  gap: 8px;
-  background-color: var(--ig-header-bg);
-  padding: 8px 12px;
-  font-weight: 600;
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--ig-text);
-  border-bottom: 1px solid var(--ig-border);
-}
-
 .ig-list-body {
-  max-height: 400px;
+  max-height: 450px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .ig-list-row {
   display: grid;
-  grid-template-columns: 1fr 130px 36px;
-  gap: 8px;
-  padding: 10px 12px;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--spacing-m);
+  padding: var(--spacing-m);
   border-bottom: 1px solid var(--ig-border);
-  transition: background-color 0.15s ease;
+  align-items: center;
+  transition: background-color 0.1s ease;
 }
 
 .ig-list-row:hover {
@@ -309,27 +273,26 @@ b {
   white-space: nowrap;
 }
 
-.ig-cell-no {
-  color: var(--ig-subtext);
-  font-weight: 600;
-}
-
 .ig-cell-email {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  min-width: 0; /* Allow text truncation */
 }
 
 .ig-cell-mobile {
-  color: var(--ig-subtext);
-  font-family: 'Consolas', 'Courier New', monospace;
-  font-size: 13px;
-  max-width: 130px;
+  width: 140px;
+  flex-shrink: 0;
 }
 
-.ig-cell-status {
+.ig-cell-actions {
+  width: 32px;
+  flex-shrink: 0;
   justify-content: center;
 }
 
-/* Mobile Number Input */
+/* ============================================ */
+/* Mobile Number Input - Fabric TextField      */
+/* ============================================ */
+
 .ig-mobile-input-wrapper {
   position: relative;
   width: 100%;
@@ -337,14 +300,20 @@ b {
 
 .ig-mobile-input {
   width: 100%;
-  padding: 4px 6px;
-  font-size: 12px;
-  font-family: 'Consolas', 'Courier New', monospace;
+  height: 32px;
+  padding: 0 var(--spacing-s);
+  font-size: 14px;
+  font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
   border: 1px solid var(--ig-border);
   border-radius: 2px;
   background-color: var(--ig-bg);
   color: var(--ig-text);
-  transition: border-color 0.15s ease;
+  transition: border-color 0.1s ease;
+  box-sizing: border-box;
+}
+
+.ig-mobile-input:hover {
+  border-color: #323130;
 }
 
 .ig-mobile-input:focus {
@@ -354,8 +323,8 @@ b {
 }
 
 .ig-mobile-input.invalid {
-  border-color: #d13438;
-  background-color: #fef6f6;
+  border-color: var(--ig-error);
+  background-color: var(--ig-error-bg);
 }
 
 .ig-mobile-input::placeholder {
@@ -363,117 +332,109 @@ b {
   font-style: italic;
 }
 
-/* Status Icons and actions */
-.ig-status-icon {
-  font-size: 14px;
-}
-
-.ig-status-icon.valid { color: #107c10; }
-.ig-status-icon.invalid { color: #d13438; }
-.ig-status-icon.empty { color: #a19f9d; }
+/* ============================================ */
+/* Action Button                                */
+/* ============================================ */
 
 .ig-actions-btn {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--ig-border);
-  background: var(--ig-bg);
-  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
-  color: var(--ig-subtext);
-}
-.ig-actions-btn:hover { background: var(--ig-hover-bg); }
-
-/* Inline error above toggle */
-#validation-error {
-  display: none;
-  margin: 8px 12px 0 12px;
-  padding: 8px 10px;
-  border: 1px solid #d13438;
-  background: #fef6f6;
-  color: #a4262c;
-  border-radius: 4px;
-  font-size: 12px;
+  color: var(--ig-text);
+  transition: all 0.1s ease;
 }
 
-/* Mobile Badge (if phone exists) */
-.ig-mobile-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.ig-mobile-badge .ms-Icon {
-  color: var(--ig-accent);
-  font-size: 12px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .ig-list-header,
-  .ig-list-row {
-    grid-template-columns: 1fr 110px 28px;
-    gap: 4px;
-    padding: 8px 10px;
-  }
-  
-  .ig-list-cell {
-    font-size: 12px;
-  }
+.ig-actions-btn:hover {
+  background: var(--ig-hover-bg);
+  border-color: var(--ig-border);
 }
 
 /* ============================================ */
-/* Secure Send Toggle Section                  */
+/* Validation Error Message                     */
+/* ============================================ */
+
+.ig-validation-error {
+  display: none;
+  margin: var(--spacing-m);
+  padding: var(--spacing-m);
+  border: 1px solid var(--ig-error);
+  background: var(--ig-error-bg);
+  color: var(--ig-error);
+  border-radius: 2px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* ============================================ */
+/* Secure Send Section in Footer               */
 /* ============================================ */
 
 .ig-secure-section {
-  background: linear-gradient(135deg, #f3f2f1 0%, #ffffff 100%);
-  border-bottom: none;
+  padding: var(--spacing-l);
+  border-bottom: 1px solid var(--ig-border);
 }
 
 .ig-secure-toggle-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: var(--spacing-l);
 }
 
 .ig-secure-info {
   flex: 1;
+  min-width: 0;
+}
+
+.ig-secure-title {
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ig-text);
 }
 
 .ig-toggle-button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 24px;
+  gap: var(--spacing-s);
+  padding: var(--spacing-m) var(--spacing-l);
   border: 2px solid var(--ig-border);
-  border-radius: 8px;
+  border-radius: 2px;
   background-color: var(--ig-bg);
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 120px;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  flex-shrink: 0;
 }
 
 .ig-toggle-button:hover {
   border-color: var(--ig-accent);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
 }
 
 .ig-toggle-button:active {
-  transform: translateY(0);
+  box-shadow: 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
 }
 
 .ig-toggle-button[aria-pressed="true"] {
-  background: linear-gradient(135deg, #0078d7 0%, #005a9e 100%);
-  border-color: #005a9e;
+  background-color: var(--ig-accent);
+  border-color: var(--ig-accent);
   color: white;
+}
+
+.ig-toggle-button[aria-pressed="true"]:hover {
+  background-color: var(--ig-accent-hover);
+  border-color: var(--ig-accent-hover);
 }
 
 .ig-toggle-button[aria-pressed="true"] .ig-toggle-label {
@@ -481,24 +442,24 @@ b {
 }
 
 .ig-toggle-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  transition: transform 0.3s ease;
+  font-size: 28px;
+  transition: transform 0.2s ease;
 }
 
 .ig-toggle-button:hover .ig-toggle-icon {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .ig-toggle-label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--ig-text);
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 /* ============================================ */
@@ -506,20 +467,18 @@ b {
 /* ============================================ */
 
 .ig-version-footer {
-  padding: 10px 12px;
-  background-color: var(--ig-header-bg);
-  border-top: 1px solid var(--ig-border);
+  padding: var(--spacing-s) var(--spacing-l);
+  background-color: var(--ig-hover-bg);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 11px;
   color: var(--ig-subtext);
-  margin-top: auto;
 }
 
 .ig-version-info {
   display: flex;
-  gap: 4px;
+  gap: var(--spacing-xs);
   align-items: center;
 }
 
@@ -533,4 +492,125 @@ b {
   font-family: 'Consolas', 'Courier New', monospace;
   color: var(--ig-accent);
   font-weight: 500;
+}
+
+/* ============================================ */
+/* Responsive Design - Task Pane Optimization  */
+/* ============================================ */
+
+/* Typical task pane width: 320px - 500px */
+
+/* Small task pane (320px - 380px) */
+@media (max-width: 380px) {
+  .ig-section {
+    padding: var(--spacing-l) var(--spacing-m);
+  }
+  
+  .ig-list-row {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-s);
+    padding: var(--spacing-m) var(--spacing-s);
+  }
+  
+  .ig-cell-mobile,
+  .ig-cell-actions {
+    width: 100%;
+  }
+  
+  .ig-cell-mobile {
+    order: 2;
+  }
+  
+  .ig-cell-actions {
+    order: 3;
+    justify-content: flex-start;
+  }
+  
+  .ig-secure-toggle-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-m);
+  }
+  
+  .ig-toggle-button {
+    width: 100%;
+    min-width: 0;
+  }
+  
+  .ig-version-footer {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    align-items: flex-start;
+  }
+}
+
+/* Medium task pane (381px - 450px) */
+@media (min-width: 381px) and (max-width: 450px) {
+  .ig-list-row {
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing-s);
+  }
+  
+  .ig-cell-mobile {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  
+  .ig-cell-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+/* Large task pane (451px+) */
+@media (min-width: 451px) {
+  .ig-list-row {
+    grid-template-columns: 1fr 160px 32px;
+  }
+  
+  .ig-cell-mobile {
+    width: 160px;
+  }
+}
+
+/* ============================================ */
+/* High Contrast Mode Support                  */
+/* ============================================ */
+
+@media (forced-colors: active) {
+  .ms-Button--primary {
+    forced-color-adjust: none;
+    background-color: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+  
+  .ig-toggle-button[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* ============================================ */
+/* Accessibility Enhancements                  */
+/* ============================================ */
+
+/* Focus visible for keyboard navigation */
+.ms-Button:focus-visible,
+.ig-toggle-button:focus-visible,
+.ig-mobile-input:focus-visible,
+.ig-actions-btn:focus-visible {
+  outline: 2px solid var(--ig-accent);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

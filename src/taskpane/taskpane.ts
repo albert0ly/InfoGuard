@@ -365,9 +365,11 @@ function toggleSecureSend() {
   button.setAttribute("aria-pressed", wantOn.toString());
   
   if (wantOn) {
+    addSecureHeader();
     icon.innerHTML = '🔒';
     label.textContent = 'Secure Send';
   } else {
+    removeSecureHeader();
     icon.innerHTML = '🔓';
     label.textContent = 'Not Secure';
   }
@@ -460,4 +462,77 @@ function clearError(): void {
     errorEl.textContent = '';
     errorEl.style.display = 'none';
   }
+}
+
+
+function addSecureHeader() {
+  // Get the current email item
+  const item = Office.context.mailbox.item;
+  
+   item.notificationMessages.removeAsync("headerNotification");
+
+  // Add custom internet header
+  item.internetHeaders.setAsync(
+    { "X-Secure-Send": "1" },
+    function(asyncResult) {
+      if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+        // Show success notification
+        Office.context.mailbox.item.notificationMessages.addAsync(
+          "headerAdded",
+          {
+            type: "informationalMessage",
+            message: "X-Secure-Send header added successfully",
+            icon: "Icon.16x16",
+            persistent: false
+          }
+        );
+      } else {
+        // Show error
+        Office.context.mailbox.item.notificationMessages.addAsync(
+          "headerError",
+          {
+            type: "errorMessage",
+            message: "Failed to add header: " + asyncResult.error.message
+          }
+        );
+      }
+
+    }
+  );
+}
+
+
+function removeSecureHeader() {
+  // Get the current email item
+  const item = Office.context.mailbox.item;
+
+   item.notificationMessages.removeAsync("headerNotification");
+
+  // Remove custom internet header
+  item.internetHeaders.removeAsync(
+    ["X-Secure-Send"],
+    function(asyncResult) {
+      if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+        // Show success notification
+        Office.context.mailbox.item.notificationMessages.addAsync(
+          "headerRemoved",
+          {
+            type: "informationalMessage",
+            message: "X-Secure-Send header removed successfully",
+            icon: "Icon.16x16",
+            persistent: false
+          }
+        );
+      } else {
+        // Show error
+        Office.context.mailbox.item.notificationMessages.addAsync(
+          "headerError",
+          {
+            type: "errorMessage",
+            message: "Failed to remove header: " + asyncResult.error.message
+          }
+        );
+      }
+    }
+  );
 }
