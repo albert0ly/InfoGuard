@@ -28,6 +28,19 @@
                 </button>
             </section>
 
+            <!-- Dialog Test Buttons Section -->
+            <section class="ig-section">
+                <h2 class="ms-font-l ig-section-title">Dialog Tests</h2>
+                <div class="ig-button-stack">
+                    <button id="openDialogOption1" class="ms-Button ms-Button--default ig-full-width-button">
+                        <span class="ms-Button-label">Option 1: Dialog API (Centered on Outlook)</span>
+                    </button>
+                    <button id="openDialogOption2" class="ms-Button ms-Button--default ig-full-width-button">
+                        <span class="ms-Button-label">Option 2: Custom Modal (Pane Only)</span>
+                    </button>
+                </div>
+            </section>
+
             <div class="ig-divider"></div>
 
             <!-- Recipients Section -->
@@ -98,6 +111,40 @@
         </footer>
     </div>
 
+    <!-- Modal Overlay for Option 2 (Initially Hidden) -->
+    <div class="ig-modal-overlay" id="customModalOverlay" onclick="closeCustomModal(event)">
+        <div class="ig-modal-dialog" onclick="event.stopPropagation()">
+            <div class="ig-modal-header">
+                <h2>Custom Modal Dialog</h2>
+                <button class="ig-modal-close-btn" onclick="closeCustomModal()" aria-label="Close">&times;</button>
+            </div>
+            
+            <div class="ig-modal-body">
+                <form id="customModalForm">
+                    <div class="form-group">
+                        <label for="modalNameInput">Name</label>
+                        <input type="text" id="modalNameInput" class="ig-modal-input" placeholder="Enter your name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modalEmailInput">Email</label>
+                        <input type="email" id="modalEmailInput" class="ig-modal-input" placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modalMessageInput">Message</label>
+                        <textarea id="modalMessageInput" class="ig-modal-textarea" placeholder="Enter your message"></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="ig-modal-footer">
+                <button class="ms-Button ms-Button--default" onclick="closeCustomModal()">Cancel</button>
+                <button class="ms-Button ms-Button--primary" onclick="submitCustomModal()">Submit</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Theme helper: detect Office host theme and apply a class when host is dark -->
     <script>
       (function () {
@@ -145,6 +192,34 @@
           });
         }
       })();
+
+      // Custom Modal Functions (Option 2)
+      function closeCustomModal(event) {
+        if (event && event.target.id !== 'customModalOverlay') return;
+        const overlay = document.getElementById('customModalOverlay');
+        overlay.classList.remove('active');
+        document.getElementById('customModalForm').reset();
+      }
+
+      function submitCustomModal() {
+        const name = document.getElementById('modalNameInput').value;
+        const email = document.getElementById('modalEmailInput').value;
+        const message = document.getElementById('modalMessageInput').value;
+        
+        console.log('Custom Modal submitted:', { name, email, message });
+        alert('Form submitted! (Check console)');
+        closeCustomModal();
+      }
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          const overlay = document.getElementById('customModalOverlay');
+          if (overlay.classList.contains('active')) {
+            closeCustomModal();
+          }
+        }
+      });
     </script>
 </body>
 

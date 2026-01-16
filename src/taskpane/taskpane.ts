@@ -15,11 +15,17 @@ interface Recipient {
   mobile: string | null;
 }
 
+let currentDialog: Office.Dialog | null = null;
+
 Office.onReady((info) => {
   if (info.host === Office.HostType.Outlook) {
     document.getElementById("getProfileButton").onclick = run;
     document.getElementById("loadRecipientsButton").onclick = loadRecipients;
     document.getElementById("secureToggle").onclick = toggleSecureSend;
+    
+    // Dialog button handlers
+    document.getElementById("openDialogOption1").onclick = openDialogOption1;
+    document.getElementById("openDialogOption2").onclick = openDialogOption2;
     
     // Initialize secure toggle button icon
     initializeSecureToggle();
@@ -58,6 +64,177 @@ export function writeDataToOfficeDocument(result: Object): void {
     userInfo += data[i] + "\n";
   }
   Office.context.mailbox.item.body.setSelectedDataAsync(userInfo, { coercionType: Office.CoercionType.Html });
+}
+
+// ============================================
+// Dialog Options
+// ============================================
+
+/**
+ * Option 1: Office Dialog API (Centered on entire Outlook window)
+ * This uses displayDialogAsync with strategies to minimize popup warnings
+ */
+function openDialogOption1() {
+  // Close existing dialog if any
+  if (currentDialog) {
+    currentDialog.close();
+    currentDialog = null;
+  }
+
+  // IMPORTANT: Dialog URL must be absolute and on same domain as your add-in
+  // For development: use your dev server URL
+  // For production: use your deployed domain
+  // If placed in assets folder, use: window.location.origin + "/assets/dialog.html"
+  const dialogUrl = window.location.origin + "/dialog.html";
+  
+  const dialogOptions: Office.DialogOptions = {
+    height: 60, // Percentage of screen height
+    width: 50,  // Percentage of screen width
+    displayInIframe: true, // TRUE to minimize popup warnings
+    promptBeforeOpen: false
+  };
+
+  Office.context.ui.displayDialogAsync(
+    dialogUrl,
+    dialogOptions,
+    (asyncResult: Office.AsyncResult<Office.Dialog>) => {
+      if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+        console.error("Dialog failed to open:", asyncResult.error.message);
+        
+        // Show error using Office notification instead of alert
+        let errorMessage = "Failed to open dialog: " + asyncResult.error.message;
+        
+        if (asyncResult.error.code === 12004) {
+          errorMessage = "Please allow popups for this add-in to open dialogs.";
+        } else if (asyncResult.error.code === 12005) {
+          errorMessage = "A dialog is already open.";
+        }
+        
+        // Display error in the validation error area
+        showError(errorMessage);
+      } else {
+        currentDialog = asyncResult.value;
+        
+        // Listen for messages from dialog
+        currentDialog.addEventHandler(
+          Office.EventType.DialogMessageReceived,
+          processDialogMessage
+        );
+        
+        // Listen for dialog events (close, errors)
+        currentDialog.addEventHandler(
+          Office.EventType.DialogEventReceived,
+          processDialogEvent
+        );
+      }
+    }
+  );
+}
+
+/**
+ * Option 2: Custom Modal (Only covers the taskpane)
+ * This doesn't center on entire Outlook, but never shows popup warnings
+ */
+function openDialogOption2() {
+  const overlay = document.getElementById('customModalOverlay');
+  if (overlay) {
+    overlay.classList.add('active');
+    
+    // Focus first input after a brief delay
+    setTimeout(() => {
+      const firstInput = document.getElementById('modalNameInput') as HTMLInputElement;
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }, 100);
+  }
+}
+
+/**
+ * Handle messages received from the Office Dialog (Option 1)
+ */
+function processDialogMessage(arg: { message: string; origin: string | undefined }) {
+  try {
+    const messageFromDialog = JSON.parse(arg.message);
+    console.log("Received from dialog:", messageFromDialog);
+    
+    // Process different actions
+    switch (messageFromDialog.action) {
+      case "submit":
+        handleDialogSubmit(messageFromDialog.data);
+        break;
+      case "cancel":
+        console.log("Dialog cancelled");
+        break;
+    }
+    
+    // Close dialog after processing
+    if (currentDialog) {
+      currentDialog.close();
+      currentDialog = null;
+    }
+  } catch (error) {
+    console.error("Error processing dialog message:", error);
+  }
+}
+
+/**
+ * Handle dialog events (user closed dialog, navigation errors, etc.)
+ */
+function processDialogEvent(arg: { error: number; type?: string }) {
+  console.log("Dialog event:", arg);
+  
+  switch (arg.error) {
+    case 12002:
+      console.log("User closed dialog");
+      break;
+    case 12003:
+      console.error("Dialog navigation failed");
+      break;
+    case 12006:
+      console.error("Dialog sent too many messages");
+      break;
+  }
+  
+  currentDialog = null;
+}
+
+/**
+ * Handle form submission from dialog
+ */
+function handleDialogSubmit(data: any) {
+  console.log("Processing dialog submission:", data);
+  
+  // Example: Insert data into email body
+  if (Office.context.mailbox && Office.context.mailbox.item) {
+    const formattedData = `Name: ${data.name}\nEmail: ${data.email}\nMessage: ${data.message}`;
+    
+    Office.context.mailbox.item.body.setSelectedDataAsync(
+      formattedData,
+      { coercionType: Office.CoercionType.Text },
+      (result) => {
+        if (result.status === Office.AsyncResultStatus.Succeeded) {
+          console.log("Data inserted into email");
+          
+          // Show success notification
+          if (Office.context.mailbox && Office.context.mailbox.item) {
+            Office.context.mailbox.item.notificationMessages.addAsync(
+              "dialogDataInserted",
+              {
+                type: "informationalMessage",
+                message: "Dialog data inserted successfully",
+                icon: "Icon.16x16",
+                persistent: false
+              }
+            );
+          }
+        } else {
+          console.error("Failed to insert data:", result.error);
+          showError("Failed to insert dialog data into email.");
+        }
+      }
+    );
+  }
 }
 
 // ============================================
@@ -218,7 +395,6 @@ function displayRecipients(recipients: Recipient[]) {
     const mobileInputId = `mobile-${recipient.no}`;
     const mobileValue = recipient.mobile || '';
     const isValid = mobileValue ? validateIsraeliMobile(mobileValue) : null;
-    // status icon removed in new UI
     
     row.innerHTML = `
       <div class="ig-list-cell ig-cell-email" title="${recipient.email}">${recipient.email}</div>
@@ -292,8 +468,6 @@ function validateMobileInput(input: HTMLInputElement) {
     input.classList.add('invalid');
   }
 }
-
-//
 
 function getStatusIcon(isValid: boolean | null): { icon: string; class: string } {
   if (isValid === null) {
@@ -464,12 +638,11 @@ function clearError(): void {
   }
 }
 
-
 function addSecureHeader() {
   // Get the current email item
   const item = Office.context.mailbox.item;
   
-   item.notificationMessages.removeAsync("headerNotification");
+  item.notificationMessages.removeAsync("headerNotification");
 
   // Add custom internet header
   item.internetHeaders.setAsync(
@@ -496,17 +669,15 @@ function addSecureHeader() {
           }
         );
       }
-
     }
   );
 }
-
 
 function removeSecureHeader() {
   // Get the current email item
   const item = Office.context.mailbox.item;
 
-   item.notificationMessages.removeAsync("headerNotification");
+  item.notificationMessages.removeAsync("headerNotification");
 
   // Remove custom internet header
   item.internetHeaders.removeAsync(

@@ -78,6 +78,11 @@ module.exports = async (env, options) => {
                 }
               },
             },
+            // ADD THIS - Copy dialog.html to dist folder
+            {
+              from: "src/taskpane/dialog.html",
+              to: "dialog.html",
+            },
           ],
         }),
         new HtmlWebpackPlugin({
