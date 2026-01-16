@@ -238,7 +238,80 @@ function handleDialogSubmit(data: any) {
 }
 
 // ============================================
-// Recipients Functionality
+// Data Persistence using Custom Properties
+// ============================================
+
+/**
+ * Save mobile numbers to the email item's custom properties
+ */
+async function saveMobileNumbers() {
+  const inputs = document.querySelectorAll('.ig-mobile-input') as NodeListOf<HTMLInputElement>;
+  const mobileData: { [email: string]: string } = {};
+  
+  inputs.forEach(input => {
+    const email = input.getAttribute('data-email');
+    const mobile = input.value.trim();
+    if (email && mobile) {
+      mobileData[email] = mobile;
+    }
+  });
+  
+  // Save to custom properties
+  return new Promise<void>((resolve, reject) => {
+    Office.context.mailbox.item.loadCustomPropertiesAsync((result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        const customProps = result.value;
+        customProps.set("infogaurd_mobile_numbers", JSON.stringify(mobileData));
+        
+        customProps.saveAsync((saveResult) => {
+          if (saveResult.status === Office.AsyncResultStatus.Succeeded) {
+            console.log("Mobile numbers saved successfully");
+            resolve();
+          } else {
+            console.error("Failed to save mobile numbers:", saveResult.error);
+            reject(saveResult.error);
+          }
+        });
+      } else {
+        console.error("Failed to load custom properties:", result.error);
+        reject(result.error);
+      }
+    });
+  });
+}
+
+/**
+ * Load mobile numbers from the email item's custom properties
+ */
+async function loadSavedMobileNumbers(): Promise<{ [email: string]: string }> {
+  return new Promise((resolve, reject) => {
+    Office.context.mailbox.item.loadCustomPropertiesAsync((result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        const customProps = result.value;
+        const savedData = customProps.get("infogaurd_mobile_numbers");
+        
+        if (savedData) {
+          try {
+            const mobileData = JSON.parse(savedData);
+            console.log("Loaded saved mobile numbers:", mobileData);
+            resolve(mobileData);
+          } catch (error) {
+            console.error("Error parsing saved mobile numbers:", error);
+            resolve({});
+          }
+        } else {
+          resolve({});
+        }
+      } else {
+        console.error("Failed to load custom properties:", result.error);
+        resolve({});
+      }
+    });
+  });
+}
+
+// ============================================
+// Recipients Functionality (Updated)
 // ============================================
 
 async function loadRecipients() {
@@ -270,8 +343,12 @@ async function loadRecipients() {
       return;
     }
 
-    // Fetch mobile numbers from Microsoft Graph
+    // Fetch mobile numbers from Microsoft Graph and middle-tier
     await fetchMobileNumbers(allRecipients);
+    
+    // THEN load saved mobile numbers and override (user input has highest priority)
+    const savedMobileNumbers = await loadSavedMobileNumbers();
+    applySavedMobileNumbers(savedMobileNumbers);
 
   } catch (error) {
     console.error("Error loading recipients:", error);
@@ -298,7 +375,7 @@ async function fetchMobileNumbers(recipients: { email: string; type: string }[])
     // Get access token for Microsoft Graph
     const token = await getGraphToken();
 
-    // First: fetch mobile numbers from Graph for each recipient
+    // Fetch mobile numbers from Graph for each recipient
     let recipientsWithMobile = await Promise.all(
       recipients.map(async (recipient, index) => {
         const mobile = await getMobileNumber(recipient.email, token);
@@ -352,6 +429,33 @@ async function fetchMobileNumbers(recipients: { email: string; type: string }[])
     
     displayRecipients(recipientsWithoutMobile);
   }
+}
+
+/**
+ * Apply saved mobile numbers to existing inputs (overrides Graph/API data)
+ * This ensures user input has the highest priority
+ */
+function applySavedMobileNumbers(savedMobileNumbers: { [email: string]: string }) {
+  if (Object.keys(savedMobileNumbers).length === 0) {
+    return;
+  }
+  
+  const inputs = document.querySelectorAll('.ig-mobile-input') as NodeListOf<HTMLInputElement>;
+  
+  inputs.forEach(input => {
+    const email = input.getAttribute('data-email');
+    const savedMobile = savedMobileNumbers[email];
+    
+    if (savedMobile) {
+      // User input overrides everything
+      input.value = savedMobile;
+      
+      // Revalidate
+      validateMobileInput(input);
+    }
+  });
+  
+  console.log("Applied saved mobile numbers (user input priority)");
 }
 
 async function getMobileNumber(email: string, token: string): Promise<string | null> {
@@ -420,7 +524,11 @@ function displayRecipients(recipients: Recipient[]) {
     // Add event listener for validation
     const input = document.getElementById(mobileInputId) as HTMLInputElement;
     input.addEventListener('input', (e) => validateMobileInput(e.target as HTMLInputElement));
-    input.addEventListener('blur', (e) => validateMobileInput(e.target as HTMLInputElement));
+    input.addEventListener('blur', (e) => {
+      validateMobileInput(e.target as HTMLInputElement);
+      // Save mobile numbers whenever user finishes editing
+      saveMobileNumbers().catch(err => console.error("Error saving mobile numbers:", err));
+    });
   });
 
   showRecipientsList();
@@ -509,10 +617,74 @@ function initializeSecureToggle() {
   const icon = button.querySelector(".ig-toggle-icon");
   const label = button.querySelector(".ig-toggle-label");
   
-  // Set initial state (not secure)
+  // Set default state first (avoid blank button)
   button.setAttribute("aria-pressed", "false");
-  icon.innerHTML = '🔓'; // Unlocked icon
+  icon.innerHTML = '🔓';
   label.textContent = 'Not Secure';
+  
+  // Load the saved state from Custom Properties
+  loadSecureToggleState().then(isSecure => {
+    console.log("Secure toggle state loaded:", isSecure);
+    button.setAttribute("aria-pressed", isSecure.toString());
+    
+    if (isSecure) {
+      icon.innerHTML = '🔒';
+      label.textContent = 'Secure Send';
+    } else {
+      icon.innerHTML = '🔓';
+      label.textContent = 'Not Secure';
+    }
+  }).catch(err => {
+    console.error("Error loading secure toggle state:", err);
+  });
+}
+
+/**
+ * Load secure toggle state from Custom Properties
+ * This is more reliable than reading headers in compose mode
+ */
+async function loadSecureToggleState(): Promise<boolean> {
+  return new Promise((resolve) => {
+    Office.context.mailbox.item.loadCustomPropertiesAsync((result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        const customProps = result.value;
+        const savedState = customProps.get("infogaurd_secure_send_state");
+        const isSecure = savedState === "true" || savedState === true;
+        console.log("Loaded secure state from custom properties:", isSecure);
+        resolve(isSecure);
+      } else {
+        console.log("No saved secure state found, defaulting to false");
+        resolve(false);
+      }
+    });
+  });
+}
+
+/**
+ * Save secure toggle state to Custom Properties
+ */
+async function saveSecureToggleState(isSecure: boolean): Promise<void> {
+  return new Promise((resolve, reject) => {
+    Office.context.mailbox.item.loadCustomPropertiesAsync((result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        const customProps = result.value;
+        customProps.set("infogaurd_secure_send_state", isSecure.toString());
+        
+        customProps.saveAsync((saveResult) => {
+          if (saveResult.status === Office.AsyncResultStatus.Succeeded) {
+            console.log("Secure toggle state saved:", isSecure);
+            resolve();
+          } else {
+            console.error("Failed to save secure toggle state:", saveResult.error);
+            reject(saveResult.error);
+          }
+        });
+      } else {
+        console.error("Failed to load custom properties:", result.error);
+        reject(result.error);
+      }
+    });
+  });
 }
 
 function toggleSecureSend() {
@@ -547,6 +719,11 @@ function toggleSecureSend() {
     icon.innerHTML = '🔓';
     label.textContent = 'Not Secure';
   }
+  
+  // Save state to Custom Properties for persistence
+  saveSecureToggleState(wantOn).catch(err => {
+    console.error("Error saving secure toggle state:", err);
+  });
   
   console.log('Secure send toggled:', wantOn);
 }
