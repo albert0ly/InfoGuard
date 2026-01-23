@@ -10,6 +10,11 @@
   "scripts": {
     "build": "node scripts/generate-version.js && webpack --mode production",
     "build:dev": "node scripts/generate-version.js && webpack --mode development",
+    "build:prod": "node scripts/generate-version.js && webpack --mode production",
+    "deploy:azure": "cd dist && tar -czf ../deploy.tar.gz * && cd .. && az webapp deployment source config-zip --name app-InfoGuard-backend-dev01 --resource-group rg-InfoGuard-dev --src deploy.tar.gz",
+    "deploy:test": "npm run build:prod", 
+    "deploy:old": "npm run build:prod && npm run deploy:azure",  
+    "deploy": "npm run build:prod && powershell -Command \"Copy-Item package.json dist/; Copy-Item package-lock.json dist/; Copy-Item .deployment dist/ -ErrorAction SilentlyContinue; Set-Location dist; Compress-Archive -Path * -DestinationPath ../deploy.zip -Force; Set-Location ..\" && az webapp deployment source config-zip --name app-InfoGuard-backend-dev01 --resource-group rg-InfoGuard-dev --src deploy.zip",
     "configure-sso": "office-addin-sso configure manifest.xml",
     "dev-server": "node --inspect=localhost:8080 dist/middletier.js",
     "lint": "office-addin-lint check",

@@ -46,6 +46,7 @@ jest/
 .env
 .env.local
 .env.*.local
+.env.*
 
 # OS
 .DS_Store
@@ -85,3 +86,15 @@ dist/**/*.css
 
 
 version.ts
+
+# Terraform
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform/
+terraform/*.tfplan
+terraform/crash.log
+
+node_modules
+
+*.zip
+*.tar.gz

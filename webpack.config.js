@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const nodeExternals = require("webpack-node-externals");
 
 const urlDev = "https://localhost:3000/";
-const urlProd = "https://www.contoso.com/"; // CHANGE THIS TO YOUR PRODUCTION DEPLOYMENT LOCATION
+const urlProd = "https://app-InfoGuard-backend-dev01.azurewebsites.net/";
 
 module.exports = async (env, options) => {
   const dev = options.mode === "development";
@@ -74,11 +74,16 @@ module.exports = async (env, options) => {
                 if (dev) {
                   return content;
                 } else {
-                  return content.toString().replace(new RegExp(urlDev, "g"), urlProd);
+                  // Replace all localhost:3000 references (with and without trailing slash)
+                  return content
+                    .toString()
+                    .replace(/https:\/\/localhost:3000\//g, urlProd)
+                    .replace(/https:\/\/localhost:3000/g, urlProd.replace(/\/$/, ''))
+                    .replace(/localhost:3000/g, 'app-InfoGuard-backend-dev01.azurewebsites.net');
                 }
               },
             },
-            // ADD THIS - Copy dialog.html to dist folder
+            // Copy dialog.html to dist folder
             {
               from: "src/taskpane/dialog.html",
               to: "dialog.html",

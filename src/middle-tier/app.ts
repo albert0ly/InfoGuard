@@ -4,9 +4,6 @@
  * This file is the main Node.js server file that defines the express middleware.
  */
 
-//if (process.env.NODE_ENV !== "production") {
-//  require("dotenv").config();
-//}
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -16,6 +13,7 @@ import * as cookieParser from "cookie-parser";
 import * as logger from "morgan";
 import express from "express";
 import https from "https";
+import http from "http";
 import { getHttpsServerOptions } from "office-addin-dev-certs";
 import { getUserData } from "./msgraph-helper";
 import { validateJwt, getAccessToken } from "./ssoauth-helper";
@@ -23,7 +21,7 @@ import { validateJwt, getAccessToken } from "./ssoauth-helper";
 /* global console, process, require, __dirname */
 
 const app = express();
-const port: number | string = process.env.API_PORT || "3000";
+const port: number | string = process.env.PORT || process.env.API_PORT || "3000";
 
 app.set("port", port);
 
@@ -47,8 +45,21 @@ if (process.env.NODE_ENV !== "production") {
     next();
   });
 } else {
-  // In production mode, let static files be cached.
-  app.use(express.static(path.join(process.cwd(), "dist")));
+  // In production mode (Azure), files are in root directory
+  const fs = require('fs');
+  console.log("=== PRODUCTION MODE DEBUG ===");
+  console.log("__dirname:", __dirname);
+  console.log("process.cwd():", process.cwd());
+  console.log("Files in __dirname:", fs.readdirSync(__dirname));
+  console.log("============================");
+  
+  app.use(express.static(__dirname));
+  
+  // Also log all requests to debug routing
+  app.use((req, res, next) => {
+    console.log(`Request: ${req.method} ${req.path}`);
+    next();
+  });
 }
 
 const indexRouter = express.Router();
@@ -136,8 +147,17 @@ app.use(function (err: any, req: any, res: any) {
   res.render("error");
 });
 
-getHttpsServerOptions().then((options) => {
-  https
-    .createServer(options, app)
-    .listen(port, () => console.log(`Server running on $3000 in ${process.env.NODE_ENV} mode`));
-});
+// Start server based on environment
+if (process.env.NODE_ENV !== "production") {
+  // Development: use HTTPS with self-signed certificate
+  getHttpsServerOptions().then((options) => {
+    https
+      .createServer(options, app)
+      .listen(port, () => console.log(`Server running on https://localhost:${port} in ${process.env.NODE_ENV} mode`));
+  });
+} else {
+  // Production: use HTTP (Azure handles HTTPS)
+  http
+    .createServer(app)
+    .listen(port, () => console.log(`Server running on port ${port} in ${process.env.NODE_ENV} mode`));
+}

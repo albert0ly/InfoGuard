@@ -1,0 +1,57 @@
+name: Deploy Backend to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'webpack.config.js'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build for production
+      run: npm run build:prod
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Deploy to Azure Web App
+      run: |
+        cd dist
+        zip -r ../deploy.zip *
+        cd ..
+        az webapp deployment source config-zip \
+          --name app-InfoGuard-backend-dev \
+          --resource-group rg-InfoGuard-dev \
+          --src deploy.zip
+    
+    - name: Set environment variables
+      run: |
+        az webapp config appsettings set \
+          --name app-InfoGuard-backend-dev \
+          --resource-group rg-InfoGuard-dev \
+          --settings \
+            NODE_ENV=production \
+            CLIENT_ID=${{ secrets.CLIENT_ID }} \
+            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
+            TENANT_ID=common \
+            AUDIENCE=api://app-InfoGuard-backend-dev.azurewebsites.net/3f2ae881-21e0-44c7-b806-6b09d7a6e16d
