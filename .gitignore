@@ -1,9 +1,9 @@
-# Node
+# ============================================================
+# Node.js / TypeScript / Office Add-in — .gitignore
+# ============================================================
+
+# Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
 # Build outputs
 dist/
@@ -19,30 +19,21 @@ lib/
 logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # Runtime data
 pids/
 *.pid
 *.seed
 
-# Testing
+# Testing / Coverage
 coverage/
 nyc_output/
-jest/
-
-# IDEs and editors
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.jest-cache/
 
 # Environment files
-.ENV
-.ENV.LOCAL
-.ENV.*.LOCAL
 .env
 .env.local
 .env.*.local
@@ -50,51 +41,44 @@ jest/
 
 # OS
 .DS_Store
-Thumbs.db
-
-# Misc
-.cache/
-.cache-loader/
-.cache/
-
-# Output of npm pack
-*.tgz
-
-# macOS
+.DS_Store?
 .AppleDouble
 .LSOverride
-
-# Windows image file caches
+Thumbs.db
 ehthumbs.db
 
-# Visual Studio Code test files
+# IDEs and editors
+.vscode/
 .vscode-test/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Binaries
-*.exe
-*.dll
+# Visual Studio
+.vs/
+UpgradeLog.htm
 
-# Ignore compiled css in dist
-dist/**/*.css
+# AI assistant tools
+.continue/
 
-# Ignore local debug/temporary files
-*.log
-
-# Keep lock file if desired - uncomment if you prefer to ignore
-# package-lock.json
-# yarn.lock
-
-
-version.ts
+# Cache
+.cache/
+.cache-loader/
 
 # Terraform
+terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.*
-terraform/.terraform/
 terraform/*.tfplan
 terraform/crash.log
 
-node_modules
-
+# Archives / packages
+*.tgz
 *.zip
 *.tar.gz
+
+# Generated version file
+version.ts
