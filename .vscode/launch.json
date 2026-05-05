@@ -1,5 +1,23 @@
 {
   "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Outlook + Middle Tier (side-by-side)",
+      "configurations": [
+        "Outlook Desktop (Edge Chromium)",
+        "Middle Tier (attach to existing)"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "Outlook + Middle Tier (launch and attach)",
+      "configurations": [
+        "Outlook Desktop (Edge Chromium)",
+        "Middle Tier (launch and attach)"
+      ],
+      "stopAll": true
+    }
+  ],
   "configurations": [
     {
       "name": "Outlook Desktop (Edge Chromium)",
