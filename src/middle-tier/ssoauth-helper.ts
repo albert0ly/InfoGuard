@@ -72,6 +72,7 @@ export function validateJwt(req, res, next): void {
         process.env.CLIENT_ID,
         `api://${process.env.CLIENT_ID}`,
         `api://localhost:3000/${process.env.CLIENT_ID}`,
+        `api://app-InfoGuard-backend-dev01.azurewebsites.net/${process.env.CLIENT_ID}`,
       ],
     };
 

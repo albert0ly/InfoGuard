@@ -5,7 +5,10 @@
  */
 
 import dotenv from 'dotenv';
-dotenv.config();
+// Load env only for non-production. In Azure, use App Settings.
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 import * as createError from "http-errors";
 import * as path from "path";
@@ -27,7 +30,8 @@ app.set("port", port);
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
+// No view engine needed; serving static files
+// app.set("view engine", "pug");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -64,7 +68,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const indexRouter = express.Router();
 indexRouter.get("/", function (req, res) {
-  res.render("/taskpane.html");
+  res.redirect("/taskpane.html");
 });
 
 app.use("/", indexRouter);
@@ -124,12 +128,15 @@ function generateRandomIsraeliMobile(): string {
 }
 // Get the client side task pane files requested
 app.get("/taskpane.html", async (req: any, res: any) => {
-  return res.sendfile("taskpane.html");
+  return res.sendFile(path.join(__dirname, "taskpane.html"));
 });
 
 app.get("/fallbackauthdialog.html", async (req: any, res: any) => {
-  return res.sendfile("fallbackauthdialog.html");
+  return res.sendFile(path.join(__dirname, "fallbackauthdialog.html"));
 });
+
+// Health check endpoint for Azure
+app.get("/health", (req: any, res: any) => res.status(200).send("OK"));
 
 // Catch 404 and forward to error handler
 app.use(function (req: any, res: any, next: any) {
@@ -138,26 +145,31 @@ app.use(function (req: any, res: any, next: any) {
 
 // error handler
 app.use(function (err: any, req: any, res: any) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+  const status = err.status || 500;
+  res.status(status).send(status === 404 ? "Not Found" : err.message || "Server Error");
 });
 
 // Start server based on environment
 if (process.env.NODE_ENV !== "production") {
-  // Development: use HTTPS with self-signed certificate
-  getHttpsServerOptions().then((options) => {
+  // Development ONLY: dynamically load dev certs
+  (async () => {
+    const { getHttpsServerOptions } = await import("office-addin-dev-certs");
+
+    const options = await getHttpsServerOptions();
     https
       .createServer(options, app)
-      .listen(port, () => console.log(`Server running on https://localhost:${port} in ${process.env.NODE_ENV} mode`));
+      .listen(port, () =>
+        console.log(`Server running on https://localhost:${port} in development mode`)
+      );
+  })().catch(err => {
+    console.error("Failed to start HTTPS dev server:", err);
+    process.exit(1);
   });
 } else {
-  // Production: use HTTP (Azure handles HTTPS)
+  // Production (Azure): HTTP only — Azure terminates HTTPS
   http
     .createServer(app)
-    .listen(port, () => console.log(`Server running on port ${port} in ${process.env.NODE_ENV} mode`));
+    .listen(port, () =>
+      console.log(`Server running on port ${port} in production mode`)
+    );
 }
