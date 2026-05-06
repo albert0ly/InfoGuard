@@ -37,3 +37,20 @@ export async function callGetRandomMobile(middletierToken: string, email: string
     throw err;
   }
 }
+
+export async function callGetFibonacci(middletierToken: string, number: number, apiBaseUrl: string): Promise<any> {
+  try {
+    const response = await $.ajax({
+      type: "POST",
+      url: `${apiBaseUrl}/api/fibonacci`,
+      headers: { Authorization: "Bearer " + middletierToken },
+      data: JSON.stringify({ number }),
+      contentType: "application/json",
+      cache: false,
+    });
+    return response;
+  } catch (err) {
+    showMessage(`Error from Fibonacci REST API. \n${err.responseText || err.message}`);
+    throw err;
+  }
+}

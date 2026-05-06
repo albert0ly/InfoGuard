@@ -21,6 +21,21 @@
     <div class="ig-container">
         <!-- Main Content Area -->
         <main class="ig-content">
+          <!-- Fibonacci Section -->
+          <section class="ig-section">
+            <h2 class="ms-font-l ig-section-title">Fibonacci Calculator</h2>
+            <div class="ig-fib-container">
+              <label for="fibonacciInput" class="ms-font-s ig-fib-label">Enter a non-negative integer</label>
+              <input type="number" id="fibonacciInput" class="ig-fib-input" min="0" step="1" placeholder="e.g. 12" />
+              <button id="fibonacciButton" class="ms-Button ms-Button--primary ig-full-width-button">
+                <span class="ms-Button-label">Get Fibonacci</span>
+              </button>
+              <div id="fibonacciResult" class="ig-fib-result" aria-live="polite"></div>
+            </div>
+          </section>
+
+          <div class="ig-divider"></div>
+
             <!-- User Profile Button Section -->
             <section class="ig-section">
                 <button id="getProfileButton" class="ms-Button ms-Button--primary ig-full-width-button">

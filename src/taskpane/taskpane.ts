@@ -6,7 +6,7 @@
 /* global document, Office */
 
 import { getUserData, getGraphToken, getMiddletierToken } from "../helpers/sso-helper";
-import { callGetRandomMobile } from "../helpers/middle-tier-calls";
+import { callGetRandomMobile, callGetFibonacci } from "../helpers/middle-tier-calls";
 import { APP_VERSION, GIT_COMMIT } from "../helpers/version";
 
 interface Recipient {
@@ -16,9 +16,11 @@ interface Recipient {
 }
 
 let currentDialog: Office.Dialog | null = null;
+const DEFAULT_FIBONACCI_API_BASE_URL = "https://localhost:7079";
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Outlook) {
+    document.getElementById("fibonacciButton").onclick = runFibonacci;
     document.getElementById("getProfileButton").onclick = run;
     document.getElementById("loadRecipientsButton").onclick = loadRecipients;
     document.getElementById("secureToggle").onclick = toggleSecureSend;
@@ -64,6 +66,43 @@ export function writeDataToOfficeDocument(result: Object): void {
     userInfo += data[i] + "\n";
   }
   Office.context.mailbox.item.body.setSelectedDataAsync(userInfo, { coercionType: Office.CoercionType.Html });
+}
+
+async function runFibonacci() {
+  const inputEl = document.getElementById("fibonacciInput") as HTMLInputElement;
+  const resultEl = document.getElementById("fibonacciResult");
+  const buttonEl = document.getElementById("fibonacciButton") as HTMLButtonElement;
+
+  if (!inputEl || !resultEl || !buttonEl) {
+    return;
+  }
+
+  const inputValue = inputEl.value.trim();
+  const number = Number(inputValue);
+
+  if (!inputValue || !Number.isInteger(number) || number < 0) {
+    resultEl.textContent = "Please enter a valid non-negative integer.";
+    return;
+  }
+
+  buttonEl.disabled = true;
+  resultEl.textContent = "Loading...";
+
+  try {
+    const middletierToken = await getMiddletierToken();
+    const response = await callGetFibonacci(middletierToken, number, getFibonacciApiBaseUrl());
+    resultEl.textContent = `F(${response.number}) = ${response.fibonacci}`;
+  } catch (error) {
+    console.error("Error calling Fibonacci REST API:", error);
+    resultEl.textContent = "Failed to calculate Fibonacci. Check API and SSO settings.";
+  } finally {
+    buttonEl.disabled = false;
+  }
+}
+
+function getFibonacciApiBaseUrl(): string {
+  const win = window as any;
+  return win.FIBONACCI_API_BASE_URL || DEFAULT_FIBONACCI_API_BASE_URL;
 }
 
 // ============================================
