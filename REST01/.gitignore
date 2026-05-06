@@ -1,0 +1,23 @@
+# .NET / Visual Studio artifacts (scoped to REST01)
+
+# Build output
+**/bin/
+**/obj/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+
+# IDE and tooling
+.vs/
+_ReSharper*/
+*.DotSettings.user
+
+# Test and coverage
+TestResults/
+*.coverage
+*.coveragexml
+
+# Logs
+*.log

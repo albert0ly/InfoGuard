@@ -1,0 +1,12 @@
+@InfoGuard.RestApi_HostAddress = https://localhost:7079
+
+POST {{InfoGuard.RestApi_HostAddress}}/api/fibonacci
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer <paste_sso_token_here>
+
+{
+	"number": 12
+}
+
+###
